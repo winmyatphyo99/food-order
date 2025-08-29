@@ -1,0 +1,91 @@
+<?php require_once APPROOT . '/views/inc/header.php' ?>
+
+<div class="dashboard-wrapper">
+    <?php require_once APPROOT . '/views/inc/sidebar.php' ?>
+
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <a href="#" class="logo-link">Admin Dashboard</a>
+            </div>
+            <div class="header-right">
+                <span>
+                    Welcome, 
+                    <strong>
+                        <?php 
+                            if (isset($_SESSION['user_name'])) {
+                                echo htmlspecialchars($_SESSION['user_name']);
+                            } else {
+                                echo 'Guest';
+                            }
+                        ?>!
+                    </strong>
+                </span>
+                <a href="<?php echo URLROOT; ?>/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="container-fluid my-5">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h4 class="mb-3 mb-md-0 text-dark fw-bold"><i class="fas fa-receipt me-2 text-primary"></i> All Invoices</h4>
+                    <a href="<?php echo URLROOT; ?>/InvoiceController/create" class="btn btn-primary px-4 shadow-sm fw-bold">
+                        <i class="fas fa-search me-2"></i> Search Invoice
+                    </a>
+                </div>
+                
+                <?php require APPROOT . '/views/components/auth_message.php'; ?>
+                
+                <div class="card shadow-lg rounded-4 border-0">
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <?php if (isset($data['invoices']) && !empty($data['invoices'])): ?>
+                                <table class="table table-hover align-middle">
+                                    <thead class="text-uppercase text-muted">
+                                        <tr>
+                                            <th scope="col" style="width: 10%;">Invoice #</th>
+                                            <th scope="col" style="width: 20%;">Customer</th>
+                                            <th scope="col" style="width: 10%;">Subtotal</th>
+                                            <th scope="col" style="width: 10%;">Delivery Fee</th>
+                                            <th scope="col" style="width: 10%;">Tax</th>
+                                            <th scope="col" style="width: 15%;">Grand Total</th>
+                                            <th scope="col" style="width: 15%;">Date</th>
+                                            <th scope="col" class="text-center" style="width: 10%;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($data['invoices'] as $invoice): ?>
+                                            <tr>
+                                                <td class="fw-bold text-primary">#<?php echo htmlspecialchars($invoice['invoice_number']); ?></td>
+                                                <td><?php echo htmlspecialchars($invoice['customer_name']); ?></td>
+                                                <td class="text-success">$<?php echo htmlspecialchars(number_format($invoice['order_subtotal'], 2)); ?></td>
+                                                <td><?php echo htmlspecialchars(number_format($invoice['delivery_fee'], 2)); ?></td>
+                                                <td><?php echo htmlspecialchars(number_format($invoice['tax_amount'], 2)); ?></td>
+                                                <td class="fw-bold text-dark">$<?php echo htmlspecialchars(number_format($invoice['grand_total'], 2)); ?></td>
+                                                <td><?php echo htmlspecialchars(date('M d, Y', strtotime($invoice['invoice_date']))); ?></td>
+                                                <td class="text-center">
+                                                    <a href="<?php echo URLROOT; ?>/OrderController/adminInvoice/<?php echo urlencode($invoice['order_id']); ?>" 
+                                                         class="btn btn-sm btn-outline-primary" title="View Invoice">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php else: ?>
+                                <div class="alert alert-info text-center py-5 rounded-4 border-0" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i> No invoices found.
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+
+<?php require_once APPROOT . '/views/inc/footer.php' ?>

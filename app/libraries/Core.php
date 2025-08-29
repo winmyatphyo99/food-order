@@ -1,0 +1,124 @@
+<?php
+class Core
+{
+    // App core class
+    // create url & load controllers
+    // URL method -/controller/method/params
+
+    protected $currentController = "Pages";
+    protected $currentMethod = "index";
+    protected $params = [];
+
+
+
+    public function __construct()
+    {
+
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+        $url = $this->getURL();
+
+
+        if (isset($url[0])) {
+
+            if (strtolower($url[0]) === 'admin' && isset($url[1]) && file_exists('../app/controllers/' . ucwords($url[0]) . 'Controller.php')) {
+                $this->currentController = ucwords($url[0]) . 'Controller'; // AdminController
+                unset($url[0]);
+            } elseif (file_exists('../app/controllers/' . ucwords($url[0]) . '.php')) {
+                $this->currentController = ucwords($url[0]);
+                unset($url[0]);
+            }
+        }
+
+        require_once('../app/controllers/' . $this->currentController . '.php');
+        $this->currentController = new $this->currentController;
+
+
+        if (isset($url[1])) {
+            if (method_exists($this->currentController, $url[1])) {
+                $this->currentMethod = $url[1];
+                unset($url[1]);
+            }
+        }
+
+
+        $this->params = $url ? array_values($url) : [];
+
+
+        $this->runMiddleware();
+
+        call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
+    }
+    public function getURL()
+    {
+        if (isset($_GET['url'])) {
+            $url = rtrim($_GET['url'], '/');
+            // FILTER_SANITIZE_URL filter removes all illegal URL characters from a string.
+            // This filter allows all letters, digits and $-_.+!*'(),{}|\\^~[]`"><#%;/?:@&=
+            $url = filter_var($url, FILTER_SANITIZE_URL); //remove illegal
+            $url = explode('/', $url); //Break a string into an array
+            return $url;
+        }
+    }
+
+    private function runMiddleware()
+    {
+        $guestRoutes = [
+            'Auth@login',
+            'Auth@register',
+            'Auth@verify',
+        ];
+
+        $authRoutes = [
+            'Pages@home',
+            'Pages@menu',
+            'Pages@menuCategory',
+            'InvoiceController@userInvoice',
+            'UserController@editProfile',
+            'UserController@changePassword',
+
+        ];
+
+        $adminRoutes = [
+            'AdminController@dashboard',
+            'AdminController@pending',
+            'AdminController@confirmOrder',
+            'InvoiceController@adminInvoice',
+            'UserController@index',
+            'UserController@delete'
+
+        ];
+
+        $controllerName = is_object($this->currentController) ? get_class($this->currentController) : $this->currentController;
+        $routeKey = $controllerName . '@' . $this->currentMethod;
+
+
+        // Guest Middleware (Second priority)
+        if (in_array($routeKey, $guestRoutes)) {
+            require_once APPROOT . '/middleware/GuestMiddleware.php';
+            $middleware = new GuestMiddleware();
+            $middleware->handle();
+            return;
+        }
+        // Admin Middleware (Highest priority)
+        if (in_array($routeKey, $adminRoutes)) {
+            require_once APPROOT . '/middleware/AdminMiddleware.php';
+            $middleware = new AdminMiddleware();
+            $middleware->handle();
+            return;
+        }
+
+
+
+        // Auth Middleware (Third priority for specific authenticated routes)
+        if (in_array($routeKey, $authRoutes)) {
+            require_once APPROOT . '/middleware/AuthMiddleware.php';
+            $middleware = new AuthMiddleware();
+            $middleware->handle();
+            return;
+        }
+
+        // Fallback: This is a public route, no middleware required.
+    }
+}
