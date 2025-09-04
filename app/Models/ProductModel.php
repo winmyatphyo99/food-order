@@ -12,7 +12,7 @@ class ProductModel
     private $product_img; // Corresponds to the 'product_img' column
     private $is_available;
     private $is_hot;
-    private $date; // Corresponds to the 'date' column
+    private $created_at; // Corresponds to the 'date' column
     
     // Getters and Setters for each property
 
@@ -98,13 +98,13 @@ class ProductModel
     }
 
 
-    public function setDate($date)
+    public function setCreatedAt($created_at)
     {
-        $this->date = $date;
+        $this->created_at = $created_at;
     }
-    public function getDate()
+    public function getCreatedAt()
     {
-        return $this->date;
+        return $this->created_at;
     }
 
     // toArray method to easily convert the object to an associative array
@@ -120,7 +120,7 @@ class ProductModel
             "product_img" => $this->getProductImg(),
             "is_available" => $this->getIsAvailable(),
             "is_hot" => $this->getIsHot(),
-            "date" => $this->getDate()
+            "date" => $this->getCreatedAt()
         ];
     }
 }

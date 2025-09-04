@@ -94,49 +94,60 @@
 <body class="bg-light">
 
 <nav class="navbar navbar-expand-lg bg-white shadow-sm py-3">
-  <div class="container">
-    <a class="navbar-brand fw-bold text-primary" href="<?php echo URLROOT; ?>">🍴 Food Order System</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="<?php echo URLROOT; ?>">🍴 Food Order System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
-        <a class="nav-link" href="<?php echo URLROOT; ?>/Pages/home">Home</a>
-        <a class="nav-link" href="<?php echo URLROOT; ?>/Pages/menu">Menu</a>
-        <a class="nav-link" href="<?php echo URLROOT; ?>/Pages/menuCategory">Category</a>
-        <a class="nav-link" href="<?php echo URLROOT; ?>/OrderController/orderHistory">My Orders</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+              <?php if (isset($_SESSION['user_id'])): ?>
+                <a class="nav-link" href="<?php echo URLROOT; ?>/CustomerController/dashboard">Dashboard</a>
+              <?php endif; ?>
+               
 
-        <li class="nav-item">
-            <a href="<?php echo URLROOT; ?>/CartController/viewCart" class="nav-link position-relative d-flex align-items-center me-2">
-                <i class="fas fa-shopping-cart me-1"></i> Your Cart
-                <?php if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) : ?>
-                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
-                        <?php echo count($_SESSION['cart']); ?>
-                    </span>
+                
+                <a class="nav-link" href="<?php echo URLROOT; ?>/Pages/menu">Menu</a>
+                <a class="nav-link" href="<?php echo URLROOT; ?>/Pages/menuCategory">Category</a>
+                
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a class="nav-link" href="<?php echo URLROOT; ?>/OrderController/orderHistory">My Orders</a>
+                    
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/CartController/viewCart" class="nav-link position-relative d-flex align-items-center me-2">
+                            <i class="fas fa-shopping-cart me-1"></i> Your Cart
+                            <?php if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])): ?>
+                                <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
+                                    <?php echo count($_SESSION['cart']); ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
                 <?php endif; ?>
-            </a>
-        </li>
-        <li class="nav-item dropdown">
-            <?php if(isset($_SESSION['user_id'])) : ?>
-                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                   <img src="<?php echo URLROOT . '/uploads/profile/' . $_SESSION['profile_image'] ?? URLROOT . '/uploads/profile/default_profile.jpg'; ?>" 
-     alt="Profile" class="rounded-circle me-2" style="width:35px; height:35px; object-fit:cover;">
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/UserController/profile">My Profile</a></li>
-                    <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/UserController/editProfile">Edit Profile</a></li>
-                    <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/UserController/changePassword">Change Password</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo URLROOT; ?>/auth/logout">Logout</a></li>
-                </ul>
-            <?php else: ?>
-                <a class="btn btn-sm btn-outline-primary" href="<?php echo URLROOT; ?>/auth/register">Register</a>
-            <?php endif; ?>
-        </li>
-      </ul>
+                
+                <li class="nav-item dropdown">
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                           <img src="<?php echo URLROOT . '/uploads/profile/' . $_SESSION['profile_image'] ?? URLROOT . '/uploads/profile/default_profile.jpg'; ?>" alt="Profile" class="rounded-circle me-2" style="width:35px; height:35px; object-fit:cover;">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/UserController/profile">My Profile</a></li>
+                            <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/UserController/editProfile">Edit Profile</a></li>
+                            <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/UserController/changePassword">Change Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="<?php echo URLROOT; ?>/auth/logout">Logout</a></li>
+                        </ul>
+                    <?php else: ?>
+                        <a class="btn btn-sm btn-outline-primary" href="<?php echo URLROOT; ?>/Pages/home">Home</a>
+                      
+                        <a class="btn btn-sm btn-outline-primary" href="<?php echo URLROOT; ?>/auth/register">Register</a>
+                        <a class="btn btn-sm btn-primary ms-2" href="<?php echo URLROOT; ?>/auth/login">Login</a>
+                    <?php endif; ?>
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

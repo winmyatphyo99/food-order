@@ -70,7 +70,7 @@ class UserController extends Controller
             }
             $this->userRepository->updateUserProfile($userId, $data);
             setMessage('success', 'Profile updated successfully!');
-            redirect('Pages/home');
+            redirect('CustomerController/dashboard');
         }
           
         // send full user row to view

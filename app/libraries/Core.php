@@ -1,12 +1,9 @@
 <?php
 class Core
 {
-    // App core class
-    // create url & load controllers
-    // URL method -/controller/method/params
-
+  
     protected $currentController = "Pages";
-    protected $currentMethod = "index";
+    protected $currentMethod = "home";
     protected $params = [];
 
 
@@ -63,65 +60,69 @@ class Core
     }
 
     private function runMiddleware()
-    {
-        $guestRoutes = [
-            'Auth@login',
-            'Auth@register',
-            'Auth@verify',
-        ];
+{
+    $guestRoutes = [
+        'Auth@login',
+        'Auth@register',
+        'Auth@verify',
+    ];
 
-        $authRoutes = [
-            'Pages@home',
-            'Pages@menu',
-            'Pages@menuCategory',
-            'InvoiceController@userInvoice',
-            'UserController@editProfile',
-            'UserController@changePassword',
-            'CartController@viewCart',
-            'CartController@updateCart',
-            'CartController@removeFromCart',
-        ];
+    $authRoutes = [
+       
+        'OrderController@orderHistory',
+        'InvoiceController@userInvoice',
+        'UserController@editProfile',
+        'UserController@changePassword',
+        'CartController@viewCart',
+        'CartController@updateCart',
+        'CartController@removeFromCart',
+        'CustomerController@orderHistory',
+        'CartController@orderConfirmation',
+    ];
 
-        $adminRoutes = [
-            'AdminController@dashboard',
-            'AdminController@pending',
-            'AdminController@confirmOrder',
-            'ProductController@index',
-            'InvoiceController@adminInvoice',
-            'InvoiceController@index',
-            'UserController@index',
-            'UserController@delete',
-            'AdminController@profile',
-            'AdminController@editProfile',
-            'AdminController@changePassword'
+    
+    $adminRoutes = [
+        'AdminController@dashboard',
+        'AdminController@pending',
+        'AdminController@confirmOrder',
+        'ProductController@index',
+        'InvoiceController@adminInvoice',
+        'InvoiceController@index',
+        'UserController@index',
+        'UserController@delete',
+        'AdminController@profile',
+        'AdminController@editProfile',
+        'AdminController@changePassword'
+    ];
 
-        ];
+    $controllerName = is_object($this->currentController) ? get_class($this->currentController) : $this->currentController;
+    $routeKey = $controllerName . '@' . $this->currentMethod;
 
-        $controllerName = is_object($this->currentController) ? get_class($this->currentController) : $this->currentController;
-        $routeKey = $controllerName . '@' . $this->currentMethod;
-
-
-        // Guest Middleware (Second priority)
-        if (in_array($routeKey, $guestRoutes)) {
-            require_once APPROOT . '/middleware/GuestMiddleware.php';
-            $middleware = new GuestMiddleware();
-            $middleware->handle();
-            return;
-        }
-        // Admin Middleware (Highest priority)
-        if (in_array($routeKey, $adminRoutes)) {
-            require_once APPROOT . '/middleware/AdminMiddleware.php';
-            $middleware = new AdminMiddleware();
-            $middleware->handle();
-            return;
-        }
-        // Auth Middleware (Third priority for specific authenticated routes)
-        if (in_array($routeKey, $authRoutes)) {
-            require_once APPROOT . '/middleware/AuthMiddleware.php';
-            $middleware = new AuthMiddleware();
-            $middleware->handle();
-            return;
-        }
-        // Fallback: This is a public route, no middleware required.
+    // Admin Middleware (Highest priority)
+    if (in_array($routeKey, $adminRoutes)) {
+        require_once APPROOT . '/middleware/AdminMiddleware.php';
+        $middleware = new AdminMiddleware();
+        $middleware->handle();
+        return;
     }
+    
+    // Auth Middleware (Second priority)
+    if (in_array($routeKey, $authRoutes)) {
+        require_once APPROOT . '/middleware/AuthMiddleware.php';
+        $middleware = new AuthMiddleware();
+        $middleware->handle();
+        return;
+    }
+    
+    // Guest Middleware (Third and final priority for specific routes)
+    if (in_array($routeKey, $guestRoutes)) {
+        require_once APPROOT . '/middleware/GuestMiddleware.php';
+        $middleware = new GuestMiddleware();
+        $middleware->handle();
+        return;
+    }
+    
+    // If the route key is not found in any of the above arrays,
+    // the code will continue, and the route is considered public by default.
+}
 }

@@ -178,7 +178,7 @@ public function register()
 
             } else {
                 setMessage('success', 'Login successful! Welcome.');
-                redirect('pages/home');
+                redirect('CustomerController/dashboard');
                 exit;
             }
 

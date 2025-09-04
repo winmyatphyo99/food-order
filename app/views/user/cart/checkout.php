@@ -1,4 +1,5 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
+<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
 
  <div class="container my-5">
      <h2 class="text-center mb-4 fw-bold">Checkout</h2>

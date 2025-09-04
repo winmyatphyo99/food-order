@@ -1,4 +1,5 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
+<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
 
 <div class="container my-5">
     <div class="card shadow p-5">

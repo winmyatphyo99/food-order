@@ -311,4 +311,32 @@ class CartController extends Controller
         // Redirect back to the cart view
         redirect('CartController/viewCart');
     }
+   
+public function addToSession()
+{
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $product_id = $_POST['product_id'];
+        $quantity = $_POST['quantity'];
+
+      
+        $this->db->query("SELECT * FROM products WHERE id = :id");
+        $this->db->bind(':id', $product_id);
+        $product = $this->db->single();
+
+        if ($product) {
+            if (!isset($_SESSION['temp_cart'])) {
+                $_SESSION['temp_cart'] = [];
+            }
+            
+            $_SESSION['temp_cart'][$product_id] = [
+                'item' => $product,
+                'quantity' => $quantity
+            ];
+            
+            setMessage('success', 'Item added to cart!');
+        }
+    }
+    // Redirect the user back to the page they came from
+     redirect('pages/login'); 
+}
 }

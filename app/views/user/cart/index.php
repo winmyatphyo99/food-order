@@ -1,6 +1,7 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
+<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
 
-<div class="container-fluid py-5" style="background-color: #f8f9fa;">
+<div class="container py-5" style="background-color: #f8f9fa;">
     <div class="row">
         <div class="col-lg-8 mb-4">
             <h2 class="fw-bold mb-4 text-dark">🛍 Your Cart</h2>

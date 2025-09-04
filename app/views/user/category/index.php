@@ -1,17 +1,33 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
+<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
 
 <section class="container my-5">
     <h2 class="text-center mb-5 fw-bold text-dark">Our Categories</h2>
-    <div class="row g-4 justify-content-center">
+
+    <div class="row g-4">
         <?php if (isset($data['categories']) && is_array($data['categories'])) : ?>
             <?php foreach($data['categories'] as $category) : ?>
-                <div class="col-6 col-sm-6 col-md-4 col-lg-3 d-flex">
-                    <div class="card h-100 border-0 shadow-lg category-card text-center text-white bg-dark">
-                        <img src="<?php echo URLROOT; ?>/img/categories/<?php echo htmlspecialchars($category['category_image']); ?>" class="card-img" alt="<?php echo htmlspecialchars($category['name']); ?>">
-                        <div class="card-img-overlay d-flex flex-column justify-content-end p-3 rounded-4">
-                            <h5 class="card-title fw-bold mb-1 text-uppercase"><?php echo htmlspecialchars($category['name']); ?></h5>
-                            
-                            <a href="<?php echo URLROOT; ?>/ProductController/category/<?php echo $category['id']; ?>" class="btn btn-warning text-white fw-bold rounded-pill">Order Now</a>
+                <div class="col-12">
+                    <div class="card h-100 border-0 shadow-lg category-card overflow-hidden">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-md-5">
+                                <img src="<?php echo URLROOT; ?>/img/categories/<?php echo htmlspecialchars($category['category_image']); ?>" 
+                                     class="img-fluid w-100 h-100 object-fit-cover rounded-start" 
+                                     alt="<?php echo htmlspecialchars($category['name']); ?>">
+                            </div>
+
+                            <div class="col-md-7 d-flex flex-column justify-content-center p-4">
+                                <h5 class="fw-bold mb-2 text-uppercase text-dark">
+                                    <?php echo htmlspecialchars($category['name']); ?>
+                                </h5>
+                                <p class="text-muted mb-3">
+                                    <?php echo htmlspecialchars($category['description']); ?>
+                                </p>
+                                <a href="<?php echo URLROOT; ?>/ProductController/category/<?php echo $category['id']; ?>" 
+                                   class="btn btn-warning text-white fw-bold rounded-pill align-self-start">
+                                    Order Now
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -25,39 +41,56 @@
 </section>
 
 <style>
-    .category-card {
-        border-radius: 1rem;
-        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        overflow: hidden;
-        position: relative;
-    }
+/* Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap');
 
-    .category-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2) !important;
-    }
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f0f2f5;
+    color: #495057;
+}
 
-    .category-card .card-img {
-        height: 250px;
-        object-fit: cover;
-        width: 100%;
-        transition: transform 0.5s ease;
-    }
+h2.text-dark {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #212529 !important;
+    font-weight: 700;
+}
 
-    .category-card:hover .card-img {
-        transform: scale(1.05);
-    }
+h5.text-dark {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700 !important;
+    color: #212529 !important;
+}
 
-    .card-img-overlay {
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.1));
-        border-radius: 1rem;
-        opacity: 1;
-        transition: opacity 0.3s ease;
-    }
+.category-card {
+    border-radius: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e9ecef;
+}
 
-    .category-card:hover .card-img-overlay {
-        opacity: 0.9;
-    }
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+.object-fit-cover {
+    object-fit: cover;
+    height: 100%;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #fff;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

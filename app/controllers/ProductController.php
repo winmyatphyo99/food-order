@@ -4,6 +4,7 @@ class ProductController extends Controller
 {
     private $productModel;
     private $db;
+    private const PRODUCTS_PER_PAGE = 5;
 
     public function __construct()
     {
@@ -11,9 +12,30 @@ class ProductController extends Controller
         $this->db = new Database();
     }
     public function index(){
+          // Get the current page number from the URL, default to 1
+        $currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+        // Calculate the offset for the SQL query
+        $offset = ($currentPage - 1) * self::PRODUCTS_PER_PAGE;
         
-        $products = $this->db->readAll('products');
-        $data = ['products' => $products];
+        // Fetch the products for the current page
+        $products = $this->db->readPaginated('products', self::PRODUCTS_PER_PAGE, $offset);
+        // Get the total count of all products
+        $totalProducts = $this->db->countAll('products');
+        
+        // Calculate the total number of pages
+        $totalPages = ceil($totalProducts / self::PRODUCTS_PER_PAGE);
+        
+        
+        // $products = $this->db->readAll('products');
+        $data = [
+        'products' => $products,
+        
+        'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalProducts' => $totalProducts
+            ]
+    ];
         $this->view('admin/product/index', $data);
     }
 
@@ -75,7 +97,7 @@ class ProductController extends Controller
                 'product_img' => $imageFileName, // Store the filename
                 'is_available' => $is_available,
                 'is_hot' => $is_hot,
-                'date' => date('Y-m-d H:i:s') // Set the current date/time
+                'created_at' => date('Y-m-d H:i:s') // Set the current date/time
             ];
 
             // Create the product

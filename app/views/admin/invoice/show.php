@@ -1,6 +1,7 @@
 <?php 
     require_once APPROOT . '/views/inc/header.php'; 
     
+    
     // Initialize subtotal and calculate it from the fetched items
     $subtotal = 0;
     if (!empty($data['items'])) {

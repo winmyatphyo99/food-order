@@ -401,7 +401,15 @@ public function executeStoredProcedure($procedureName, $params) {
 }
 
 
-public function rowCount() { return $this->stmt->rowCount(); }
+    public function rowCount() { return $this->stmt->rowCount(); }
+
+
+    public function readPaginated($table, $limit, $offset) {
+        $this->query("SELECT * FROM " . $table . " ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+        $this->bind(':limit', $limit, PDO::PARAM_INT);
+        $this->bind(':offset', $offset, PDO::PARAM_INT);
+        return $this->resultSet();
+    }  
 
     
 }

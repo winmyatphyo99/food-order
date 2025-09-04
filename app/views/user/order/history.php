@@ -1,4 +1,5 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
+<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
 
 <div class="container my-5">
     <div class="card shadow-lg border-0 rounded-4">
@@ -52,6 +53,12 @@
                                         <?php if ($order['status'] == 'completed' || $order['status'] == 'confirmed'): ?>
                                             <a href="<?php echo URLROOT; ?>/OrderController/userInvoice/<?php echo htmlspecialchars($order['order_id']); ?>" class="btn btn-sm btn-outline-primary shadow-sm rounded-pill">
                                                 <i class="fas fa-eye me-1"></i> View Invoice Details
+                                            </a>
+                                        <?php elseif ($order['status'] == 'pending'): ?>
+                                            <a href="<?php echo URLROOT; ?>/OrderController/cancel/<?php echo htmlspecialchars($order['order_id']); ?>"
+                                               class="btn btn-sm btn-outline-danger shadow-sm rounded-pill"
+                                               onclick="return confirm('Are you sure you want to cancel this order?');">
+                                                <i class="fas fa-times-circle me-1"></i> Cancel Order
                                             </a>
                                         <?php else: ?>
                                             <span class="text-muted">No details available</span>

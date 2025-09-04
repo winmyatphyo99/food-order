@@ -152,7 +152,7 @@ class AdminController extends Controller
         }
     }
 
-    public function index()
+    public function home()
     {
         $this->db->query("SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at DESC");
         $this->db->execute();

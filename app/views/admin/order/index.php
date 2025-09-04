@@ -26,7 +26,6 @@
                                         <tr>
                                             <th scope="col">Order #</th>
                                             <th scope="col">Customer #</th>
-
                                             <th scope="col">Total Amount</th>
                                             <th scope="col">Order Status</th>
                                             <th scope="col">Order Date</th>
@@ -40,7 +39,6 @@
                                                     <h6 class="mb-0 fw-bold text-primary">#<?php echo htmlspecialchars($order['id']); ?></h6>
                                                 </td>
                                                 <td><?php echo htmlspecialchars($order['user_id']); ?></td>
-
                                                 <td class="fw-bold text-success">$<?php echo htmlspecialchars(number_format($order['total_amt'], 2)); ?></td>
                                                 <td class="text-center">
                                                     <?php
@@ -90,6 +88,13 @@
                                                             class="btn btn-sm btn-outline-secondary me-2" title="Edit Order">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
+                                                        <?php if ($order['status'] != 'cancelled' && $order['status'] != 'completed'): ?>
+                                                            <a href="<?php echo URLROOT; ?>/OrderController/cancel/<?php echo base64_encode($order['id']); ?>"
+                                                               class="btn btn-sm btn-outline-danger me-2" title="Cancel Order"
+                                                               onclick="return confirm('Are you sure you want to cancel this order? This will restore the products to stock.');">
+                                                                <i class="fas fa-times-circle"></i>
+                                                            </a>
+                                                        <?php endif; ?>
                                                         <a href="<?php echo URLROOT; ?>/OrderController/destroy/<?php echo base64_encode($order['id']); ?>"
                                                             class="btn btn-sm btn-outline-danger" title="Delete Order"
                                                             onclick="return confirm('Are you sure you want to delete this order?');">
@@ -107,12 +112,42 @@
                                 </div>
                             <?php endif; ?>
                         </div>
+                         <?php if (isset($data['pagination']) && $data['pagination']['totalPages'] > 1): ?>
+                            <nav aria-label="Order Page Navigation" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    <?php
+                                    $currentPage = $data['pagination']['currentPage'];
+                                    $totalPages = $data['pagination']['totalPages'];
+                                    $urlRoot = URLROOT . '/OrderController/index';
+                                    ?>
+                                    
+                                    <li class="page-item <?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $currentPage - 1; ?>" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                                            <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $i; ?>">
+                                                <?php echo $i; ?>
+                                            </a>
+                                        </li>
+                                    <?php endfor; ?>
+
+                                    <li class="page-item <?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
+                                        <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $currentPage + 1; ?>" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 </div>
-
 
 <?php require_once APPROOT . '/views/inc/footer.php'; ?>

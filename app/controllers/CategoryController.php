@@ -4,6 +4,7 @@ class CategoryController extends Controller
 {
     private $categoryModel;
     private $db;
+     private const CATEGORIES_PER_PAGE = 5;
 
     public function __construct()
     {
@@ -11,18 +12,35 @@ class CategoryController extends Controller
         $this->db = new Database();
     }
 
-public function index()
+  public function index()
     {
-        $categories = $this->db->readAll('categories');
+        // Get the current page number from the URL, defaulting to 1
+        $currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+        
+        // Calculate the offset for the SQL query
+        $offset = ($currentPage - 1) * self::CATEGORIES_PER_PAGE;
+        
+        // Fetch the categories for the current page
+        $categories = $this->db->readPaginated('categories', self::CATEGORIES_PER_PAGE, $offset);
+        
+        // Get the total count of all categories
+        $totalCategories = $this->db->countAll('categories');
+        
+        // Calculate the total number of pages
+        $totalPages = ceil($totalCategories / self::CATEGORIES_PER_PAGE);
+
+        // Prepare the data to pass to the view, including pagination info
         $data = [
-            'categories' => $categories
+            'categories' => $categories,
+            'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalCategories' => $totalCategories
+            ]
         ];
+        
         $this->view('admin/category/index', $data);
-
-        
-        
     }
-
     public function category($id)
     {
         // 1. Get products filtered by category ID
