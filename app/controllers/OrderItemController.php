@@ -32,13 +32,6 @@ class OrderItemController extends Controller
 
     // 2. Fetch all order items for this order
     $orderItems = $this->db->findAllBy('order_items_view', 'order_id', $id);
-
-    // Debugging
-    // var_dump($orderItems); exit;
-
-    // 3. Pass to view
-//  $order → single row (main order details).
-// $orderItems → multiple rows (all products in that order).
     $data = [
         'order' => $order,
         'order_items' => $orderItems

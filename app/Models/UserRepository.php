@@ -16,13 +16,12 @@ class UserRepository
     return $this->db->resultSet();
 }
 
-    
-public function getUserById($id) {
-    $this->db->query("SELECT id, name, email, phone_number, profile_image FROM users WHERE id = :id");
+   public function getUserById($id) {
+    // Corrected query to include the 'password' column
+    $this->db->query("SELECT id, name, email, phone_number, profile_image, password FROM users WHERE id = :id");
     $this->db->bind(':id', $id);
     return $this->db->single();
 }
-
 public function updateUserProfile($id, $data) {
     $fields = [];
     $params = [':id' => $id];

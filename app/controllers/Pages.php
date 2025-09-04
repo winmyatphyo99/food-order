@@ -13,7 +13,7 @@ class Pages extends Controller
 
     public function index()
     {
-        $this->view('pages/login');
+        $this->view('pages/home');
     }
 
     public function login()
@@ -33,30 +33,43 @@ class Pages extends Controller
         $this->view('pages/about');
     }
 
-    public function home()
-    {
-        $hotProducts = $this->db->query("SELECT * FROM products WHERE is_hot = 1");
-        $hotProducts = $this->db->resultSet();
-        $data = [
-            'hotProducts' => $hotProducts
-        ];
-        $this->view('pages/home', $data);
-       
-    }
-
-    public function menu()
+   public function home()
 {
-    // 1. Get products filtered by category ID
-    $products = $this->db->readAll('products');
+   
+    // Query the V_best_selling_products view to get the top 6 items
+    $this->db->query("SELECT * FROM V_best_selling_products LIMIT 6");
+    $hotProducts = $this->db->resultSet();
+
+    $data = [
+        'hotProducts' => $hotProducts
+    ];
+    $this->view('pages/home', $data);
+}
+
+  
+    public function menu($category_id = null)
+{
+   
+    // Fetch all categories to display the category links
     $categories = $this->db->readAll('categories');
 
-    
+     // Fetch products based on the category_id.
+    if ($category_id) {
+        $this->db->query("SELECT * FROM products WHERE category_id = :category_id");
+        $this->db->bind(':category_id', $category_id);
+        $products = $this->db->resultSet();
+    } else {
+        // If no category is selected, show all products
+        $products = $this->db->readAll('products');
+    }
+
 
     // 2. Prepare the data for the view
+    
     $data = [
-        'title' => 'Our Menu',
+        'categories' => $categories,
         'products' => $products,
-        'categories' => $categories
+        'selected_category_id' => $category_id
     ];
     $this->view('user/product/category', $data);
 }

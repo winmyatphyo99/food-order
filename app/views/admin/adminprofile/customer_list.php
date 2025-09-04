@@ -4,34 +4,13 @@
     <?php require_once APPROOT . '/views/inc/sidebar.php'; ?>
 
     <main class="main-content">
-        <header class="top-header">
-            <div class="header-left">
-                <a href="#" class="logo-link">Admin Dashboard</a>
-            </div>
-            <div class="header-right">
-                <span>
-                    Welcome,
-                    <strong>
-                        <?php
-                        if (isset($_SESSION['user_name'])) {
-                            echo htmlspecialchars($_SESSION['user_name']);
-                        } else {
-                            echo 'Guest';
-                        }
-                        ?>!
-                    </strong>
-                </span>
-                <a href="<?php echo URLROOT; ?>/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </header>
+        <?php require_once APPROOT . '/views/inc/admin_logo.php'; ?>
 
         <div class="content-area">
             <div class="container-fluid my-5">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
                     <h4 class="mb-3 mb-md-0 text-dark fw-bold"><i class="fas fa-users me-2 text-primary"></i>All Customer Lists</h4>
-                    <!-- <a href="<?php echo URLROOT; ?>/user/create" class="btn btn-primary px-4 shadow-sm fw-bold">
-                        <i class="fas fa-plus me-2"></i> Add New User
-                    </a> -->
+                    
                 </div>
 
                 <?php require APPROOT . '/views/components/auth_message.php'; ?>
@@ -66,11 +45,7 @@
                                                 </td>
                                                 <td><?php echo htmlspecialchars($user['name']); ?></td>
                                                 <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                                <!-- <td>
-                                                    <span class="badge bg-secondary rounded-pill px-3 py-2">
-                                                        <?php echo htmlspecialchars(ucfirst($user['role'])); ?>
-                                                    </span>
-                                                </td> -->
+                                               
                                                 <td>
                                                     <span class="badge bg-success rounded-pill px-3 py-2">
                                                         <?php echo htmlspecialchars($user['total_orders']); ?>
@@ -78,15 +53,8 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center">
-                                                        <!-- <a href="<?php echo URLROOT; ?>/user/edit/<?php echo htmlspecialchars($user['id']); ?>"
-                                                            class="btn btn-sm btn-outline-secondary me-2" title="Edit User">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <a href="<?php echo URLROOT; ?>/user/changePassword/<?php echo htmlspecialchars($user['id']); ?>"
-                                                            class="btn btn-sm btn-outline-info me-2" title="Change Password">
-                                                            <i class="fas fa-key"></i>
-                                                        </a> -->
-                                                        <a href="<?php echo URLROOT; ?>/user/delete/<?php echo htmlspecialchars($user['id']); ?>"
+                                                        
+                                                        <a href="<?php echo URLROOT; ?>/UserController/delete/<?php echo htmlspecialchars($user['id']); ?>"
                                                             class="btn btn-sm btn-outline-danger" title="Delete User"
                                                             onclick="return confirm('Are you sure you want to delete this user?');">
                                                             <i class="fas fa-trash"></i>

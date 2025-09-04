@@ -24,7 +24,7 @@ class UserController extends Controller
     public function index()
     {
         $users = $this->userRepository->getAllUsersWithOrderCount();
-        $this->view('admin/userprofile/index', ['users' => $users]);
+        $this->view('admin/adminprofile/customer_list', ['users' => $users]);
     }
 
     /**
@@ -34,47 +34,45 @@ class UserController extends Controller
     {
         $this->userRepository->delete($id);
         setMessage('success', 'User deleted successfully.');
-        redirect('user/index');
+        redirect('UserController/index');
     }
+
+     public function profile() {
+        $user = $this->userRepository->getUserById($_SESSION['user_id']);
+        $this->view('user/userprofile/profile', ['user' => $user]);
+    }
+
 
     /**
      * User - Edit own profile
      */
     public function editProfile()
     {
-
-        //  echo "<pre>";
-        // print_r($_SESSION);exit;
         $userId = $_SESSION['user_id'];
         $user = $this->userRepository->getUserById($userId);
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
             $data = [
                 'name' => trim($_POST['name']),
                 'email' => trim($_POST['email']),
                 'phone_number' => trim($_POST['phone_number'])
             ];
-
             if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
+             
                 $filename = time() . '_' . basename($_FILES['profile_image']['name']);
-                $target = APPROOT . '/uploads/profile/' . $filename;
+                $target =  APPROOT . '/../public/uploads/profile/' . $filename;
                 if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $target)) {
                     $data['profile_image'] = $filename;
-
+                    //  var_dump($data['profile_image'] );exit;
                     // Update session with new image name
                     $_SESSION['profile_image'] = $filename;
                 }
             }
-
-
-
             $this->userRepository->updateUserProfile($userId, $data);
             setMessage('success', 'Profile updated successfully!');
             redirect('Pages/home');
         }
-
+          
         // send full user row to view
         $this->view('user/userprofile/edit', ['user' => $user]);
     }
@@ -90,10 +88,12 @@ class UserController extends Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             $current = trim($_POST['current_password']);
+            
             $new = trim($_POST['new_password']);
             $confirm = trim($_POST['confirm_password']);
 
-            if (!password_verify($current, $user['password'])) {
+            if (!password_verify($current, $user->password)) {
+               
                 setMessage('error', 'Current password is incorrect!');
                 redirect('user/changePassword');
             } elseif ($new !== $confirm) {

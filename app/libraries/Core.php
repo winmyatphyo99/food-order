@@ -77,16 +77,23 @@ class Core
             'InvoiceController@userInvoice',
             'UserController@editProfile',
             'UserController@changePassword',
-
+            'CartController@viewCart',
+            'CartController@updateCart',
+            'CartController@removeFromCart',
         ];
 
         $adminRoutes = [
             'AdminController@dashboard',
             'AdminController@pending',
             'AdminController@confirmOrder',
+            'ProductController@index',
             'InvoiceController@adminInvoice',
+            'InvoiceController@index',
             'UserController@index',
-            'UserController@delete'
+            'UserController@delete',
+            'AdminController@profile',
+            'AdminController@editProfile',
+            'AdminController@changePassword'
 
         ];
 
@@ -108,9 +115,6 @@ class Core
             $middleware->handle();
             return;
         }
-
-
-
         // Auth Middleware (Third priority for specific authenticated routes)
         if (in_array($routeKey, $authRoutes)) {
             require_once APPROOT . '/middleware/AuthMiddleware.php';
@@ -118,7 +122,6 @@ class Core
             $middleware->handle();
             return;
         }
-
         // Fallback: This is a public route, no middleware required.
     }
 }

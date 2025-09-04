@@ -365,7 +365,43 @@ public function rollBack()
 }
 
 
+public function searchProducts($query)
+{
+    $this->query('SELECT * FROM products WHERE product_name LIKE :query OR description LIKE :query');
+    $this->bind(':query', '%' . $query . '%');
+    return $this->resultSet();
+}
 
+public function getProductsByCategory($category_id)
+{
+    $this->query('SELECT * FROM products WHERE category_id = :category_id');
+    $this->bind(':category_id', $category_id);
+    return $this->resultSet();
+}
+
+
+
+public function executeStoredProcedure($procedureName, $params) {
+    // Construct the CALL statement with placeholders
+    $sql = "CALL " . $procedureName . "(";
+    $placeholders = [];
+    foreach ($params as $paramName => $paramValue) {
+        $placeholders[] = ':' . $paramName;
+    }
+    $sql .= implode(', ', $placeholders) . ")";
+
+    // Prepare and bind the statement
+    $this->query($sql);
+    foreach ($params as $paramName => $paramValue) {
+        $this->bind(':' . $paramName, $paramValue);
+    }
+    
+    // Execute the stored procedure
+    return $this->execute();
+}
+
+
+public function rowCount() { return $this->stmt->rowCount(); }
 
     
 }

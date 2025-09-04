@@ -23,20 +23,17 @@ public function index()
         
     }
 
-    
+    public function category($id)
+    {
+        // 1. Get products filtered by category ID
+        $products = $this->db->getProductsByCategoryId($id);
 
-    // Add this new method
-public function category($id)
-{
-    // 1. Get products filtered by category ID
-    $products = $this->db->getProductsByCategoryId($id);
-
-    // 2. Prepare the data for the view
-    $data = [
-        'products' => $products
-    ];
-    $this->view('user/product/category', $data);
-}
+        // 2. Prepare the data for the view
+        $data = [
+            'products' => $products
+        ];
+        $this->view('user/product/category', $data);
+    }
 
     public function create()
     {
@@ -124,7 +121,7 @@ public function category($id)
             ];
 
             // Handle image upload
-            $imageFileName = $existingCategory['category_image']; // Default to existing image
+            $imageFileName = $existingCategory['category_image']; 
             if (isset($_FILES['category_image']) && $_FILES['category_image']['error'] === UPLOAD_ERR_OK) {
                 $file = $_FILES['category_image'];
                 $newImageFileName = time() . '_' . basename($file['name']);

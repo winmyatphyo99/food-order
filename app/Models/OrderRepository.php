@@ -36,6 +36,29 @@ class OrderRepository
         return $this->db->single();
     }
 
-   
+    public function getTodayRevenue() {
+    $this->db->query("
+        SELECT * FROM `today_revenue`
+    ");
+    $result = $this->db->single();
+    return $result->total_revenue ?? 0;
+}
+// In a file like app/models/OrderRepository.php
+
+public function countConfirmedOrders() {
+    $this->db->query("SELECT COUNT(*) AS total_confirmed FROM orders WHERE status = 'confirmed'");
+    $result = $this->db->single();
+
+    return $result->total_confirmed ?? 0;
+}
+
+// This method counts the total number of orders in the 'orders' table.
+    public function getTotalOrdersCount() {
+        $this->db->query('SELECT COUNT(*) AS total FROM orders');
+        $row = $this->db->single();
+        return $row->total;
+    }
+
+ 
 }
 

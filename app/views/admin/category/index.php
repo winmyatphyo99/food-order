@@ -4,26 +4,7 @@
     <?php require_once APPROOT . '/views/inc/sidebar.php'; ?>
     
     <main class="main-content">
-        <header class="top-header">
-            <div class="header-left">
-                <a href="#" class="logo-link">Admin Dashboard</a>
-            </div>
-            <div class="header-right">
-                <span>
-                    Welcome, 
-                    <strong>
-                        <?php 
-                            if (isset($_SESSION['user_name'])) {
-                                echo htmlspecialchars($_SESSION['user_name']);
-                            } else {
-                                echo 'Guest';
-                            }
-                        ?>!
-                    </strong>
-                </span>
-                <a href="<?php echo URLROOT; ?>/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </header>
+        <?php require_once APPROOT . '/views/inc/admin_logo.php'; ?>
 
         <div class="content-area">
             <div class="container-fluid my-5">

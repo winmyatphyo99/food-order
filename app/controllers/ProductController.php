@@ -10,8 +10,6 @@ class ProductController extends Controller
         $this->model('ProductModel');
         $this->db = new Database();
     }
-
-
     public function index(){
         
         $products = $this->db->readAll('products');
@@ -25,13 +23,9 @@ class ProductController extends Controller
         $data = [
             'products' => $products
         ];
-        $this->view('user/product/category',$data);
+        $this->view('user/product/productCategory',$data);
 
     }
-
-    
-
-
     public function create()
     {
         // Get categories to populate a dropdown in the create form

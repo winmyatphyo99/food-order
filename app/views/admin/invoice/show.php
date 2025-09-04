@@ -8,7 +8,6 @@
             $subtotal += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
         }
     }
-
     // Get the fees and calculate the grand total
     $deliveryFee = $data['order']->delivery_fee ?? 0;
     $taxAmount = $data['order']->tax_amount ?? 0;
@@ -22,26 +21,11 @@
 
     <main class="main-content">
         <?php if ($data['role'] === 'admin'): ?>
-            <header class="top-header d-print-none">
-                <div class="header-left">
-                    <a href="#" class="logo-link">Admin Dashboard</a>
-                </div>
-                <div class="header-right">
-                    <span>
-                        Welcome, <strong>
-                            <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Guest'); ?>!
-                        </strong>
-                    </span>
-                    <a href="<?php echo URLROOT; ?>/auth/logout" class="logout-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
-            </header>
+            <?php require_once APPROOT . '/views/inc/admin_logo.php'; ?>
         <?php endif; ?>
 
         <div class="content-area">
             <div class="container-fluid my-5">
-                
                 <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
                     <h4 class="mb-0 text-dark fw-bold">
                         <i class="fas fa-receipt me-2 text-primary"></i> Invoice
@@ -65,7 +49,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="row justify-content-center">
                     <div class="col-lg-7">
                         <div id="invoiceArea" class="card shadow-lg border-0 rounded-4">

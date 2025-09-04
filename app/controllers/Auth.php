@@ -310,6 +310,7 @@ public function register()
         $_SESSION['user_name']  = $user['name'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role']  = $user['role'];
+       $_SESSION['profile_image'] = $user['profile_image'] ?? null;
         
     }
 

@@ -4,6 +4,7 @@ class OrderController extends Controller
 {
     private $orderModel;
     private $db;
+    private const ORDERS_PER_PAGE = 6;
     private $orderRepository;
 
     public function __construct()
@@ -38,7 +39,7 @@ class OrderController extends Controller
 
     if (!$order) {
         // No order found, redirect or show error
-        redirect('orders/index'); // or show an error page
+        redirect('orders/index'); 
         return;
     }
 
@@ -58,45 +59,53 @@ class OrderController extends Controller
 }
 
 
-
-
-
 public function orderHistory() {
     $user_id = $_SESSION['user_id'];
     
     // Use the correct method name for your Database class, likely 'resultSet()'
     $this->db->query("SELECT * FROM `user_order_history_view` WHERE user_id = :user_id ORDER BY order_date DESC");
     $this->db->bind(':user_id', $user_id);
-    
-    // Corrected line:
-    $orders = $this->db->resultSet(); 
-    
+    $orders = $this->db->resultSet();     
     $this->view('user/order/history', ['orders' => $orders]);
 }
 
 
-    public function index()
-{
-    // Change the query to use the database view
-    $orders = $this->db->readAll('orders');
-  
-    
+     public function index()
+    {
+        // Get the current page number from the URL, defaulting to 1
+        $currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+        
+        // Calculate the offset for the SQL query
+        $offset = ($currentPage - 1) * self::ORDERS_PER_PAGE;
+        
+        // Fetch the orders for the current page
+        $orders = $this->db->readPaginated('orders', self::ORDERS_PER_PAGE, $offset);
+        
+        // Get the total count of all orders
+        $totalOrders = $this->db->countAll('orders');
+        
+        // Calculate the total number of pages
+        $totalPages = ceil($totalOrders / self::ORDERS_PER_PAGE);
 
-    $data = [
-        'orders' => $orders
-         
-    ];
+        // Prepare the data to pass to the view, including pagination info
+        $data = [
+            'orders' => $orders,
+            'pagination' => [
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'totalOrders' => $totalOrders
+            ]
+        ];
+        
+        $this->view('admin/order/index', $data);
+    }
 
-    $this->view('admin/order/index', $data);
-}
     public function create()
     {
         $orders = $this->db->readAll('orders');
         $products = $this->db->readAll('products');
         $users = $this->db->readAll('users');
-        $payments = $this->db->readAll('payments');//['status' => 'active']
-
-
+        $payments = $this->db->readAll('payments');
         $data = [
             'orders' => $orders,
             'products'=> $products,
@@ -106,74 +115,115 @@ public function orderHistory() {
         $this->view('admin/order/create',$data);
     }
 
-   public function store()
+  public function store()
 {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $user_id = $_POST['user_id'];
-        $payment_method_id = $_POST['payment_method_id'];
-        $delivery_address = $_POST['delivery_address'];
-        $status = $_POST['status'];
+        // Start a database transaction to ensure data integrity
+        $this->db->beginTransaction();
 
-        $product_id = $_POST['product_id'] ?? [];
-        $quantity = $_POST['quantity'] ?? [];
-        
-        // Check if no products were submitted.
-        if (empty($product_id) || empty($quantity)) {
-            setMessage('error', 'Please add at least one product to the order.');
-            redirect('OrderController/create');
-            return;
-        }
+        try {
+            // 1. Sanitize and validate user input
+            $user_id = filter_var($_POST['user_id'], FILTER_SANITIZE_NUMBER_INT);
+            $payment_method_id = filter_var($_POST['payment_method_id'], FILTER_SANITIZE_NUMBER_INT);
+            $delivery_address = filter_var($_POST['delivery_address'], FILTER_SANITIZE_STRING);
+            $status = filter_var($_POST['status'], FILTER_SANITIZE_STRING);
 
-        $total_amt = 0;
-        foreach ($product_id as $index => $pid) {
-            $product = $this->db->getById('products', $pid);
-            $total_amt += $product['price'] * $quantity[$index];
-        }
+            $product_ids = $_POST['product_id'] ?? [];
+            $quantities = $_POST['quantity'] ?? [];
 
-        $data = [
-            'user_id' => $user_id,
-            'payment_method_id' => $payment_method_id,
-            'total_amt' => $total_amt,
-            'delivery_address' => $delivery_address,
-            'status' => $status,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-       
-
-        
-        // Save order first
-        if ($this->db->create('orders', $data)) {
-            $order_id = $this->db->lastInsertId();
-             
-
-            
-            // Save each product into order_items
-            foreach ($product_id as $index => $pid) {
-                $product = $this->db->getById('products', $pid);
-                $order_item = [
-                    'order_id' => $order_id,
-                    'product_id' => $pid,
-                    'quantity' => $quantity[$index],
-                    'price' => $product['price'],
-                    'created_at' => date('Y-m-d H:i:s')
-                ];
-                $this->db->create('order_items', $order_item);
-            //     echo "<pre>";
-            //  var_dump($order_id);
-            //   exit;
+            if (empty($product_ids) || empty($quantities)) {
+                setMessage('error', 'Please add at least one product to the order.');
+                redirect('OrderController/create');
+                return;
             }
 
+            $subtotal = 0;
+            $order_items_to_save = [];
+
+            // 2. Loop through products to check stock and calculate subtotal
+            foreach ($product_ids as $index => $pid) {
+                $qty = filter_var($quantities[$index], FILTER_SANITIZE_NUMBER_INT);
+                
+                $product = $this->db->getById('products', $pid);
+                
+                if (!$product || $product['quantity'] < $qty) {
+                    $this->db->rollBack();
+                    setMessage('error', 'Not enough stock for a product in your order.');
+                    redirect('OrderController/create');
+                    return;
+                }
+                
+                $product_price = $product['price'];
+                $subtotal += $product_price * $qty;
+
+                $order_items_to_save[] = [
+                    'product_id' => $pid,
+                    'quantity' => $qty,
+                    'price' => $product_price
+                ];
+            }
+
+            // 3. Calculate delivery fee, tax, and grand total
+            $delivery_fee = 5.00; // Example fixed fee
+            $tax_rate = 0.05; // Example 5% tax rate
+            $tax_amount = $subtotal * $tax_rate;
+            $grand_total = $subtotal + $delivery_fee + $tax_amount;
+
+            // 4. Prepare and save the main order record
+            $order_data = [
+                'user_id' => $user_id,
+               
+                'payment_method_id' => $payment_method_id,
+                'total_amt' => $subtotal,
+                'delivery_fee' => $delivery_fee,
+                'tax_amount' => $tax_amount,
+                'grand_total' => $grand_total,
+                'delivery_address' => $delivery_address,
+                'status' => $status,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+            
+            if (!$this->db->create('orders', $order_data)) {
+                $this->db->rollBack();
+                setMessage('error', 'Failed to create the main order record.');
+                redirect('OrderController/create');
+                return;
+            }
+
+            $order_id = $this->db->lastInsertId();
+
+            // 5. Save each order item without reducing stock
+            foreach ($order_items_to_save as $item) {
+                $order_item_data = [
+                    'order_id' => $order_id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'created_at' => date('Y-m-d H:i:s')
+                ];
+                
+                if (!$this->db->create('order_items', $order_item_data)) {
+                    $this->db->rollBack();
+                    setMessage('error', 'Failed to create one or more order items.');
+                    redirect('OrderController/create');
+                    return;
+                }
+            }
+            
+            // 6. Commit the transaction after all operations are successful
+            $this->db->commit();
             setMessage('success', 'Order created successfully!');
             redirect('OrderController/index');
-        } else {
-            setMessage('error', 'Failed to create order.');
+
+        } catch (Exception $e) {
+            // Catch any unexpected errors and rollback the transaction
+            $this->db->rollBack();
+            setMessage('error', 'An unexpected error occurred: ' . $e->getMessage());
             redirect('OrderController/create');
         }
     }
 }
-
-
     public function edit($id)
     {
         $order = $this->db->getById('orders', $id);
@@ -202,11 +252,11 @@ public function orderHistory() {
                 'payment_method_id' => trim($_POST['payment_method_id']),
                 'total_amt' => trim($_POST['total_amt']),
                 'delivery_address' => trim($_POST['delivery_address']),
-                'status' => trim($_POST['status']),
+                'status' => trim($_POST['status']),//The key field for the trigger
                 'updated_at' => date('Y-m-d H:i:s')
             ];
 
-            // Update the order
+            // Update the order// Update the order. The trigger will fire automatically on success.
             if ($this->db->update('orders', $id, $data)) {
                 setMessage('success', 'Order updated successfully');
                 redirect('OrderController/index');
@@ -240,7 +290,35 @@ public function orderHistory() {
 }
 
 
-    
+public function cancel($order_id)
+{
+    // 1. Sanitize the order ID
+    $order_id = filter_var($order_id, FILTER_SANITIZE_NUMBER_INT);
 
+    // 2. Fetch the current order
+    $this->db->query("SELECT * FROM orders WHERE id = :id");
+    $this->db->bind(':id', $order_id);
+    $current_order = $this->db->single();
+
+    // 3. Check if order belongs to the user and is still pending
+    if ($current_order && $current_order->user_id == $_SESSION['user_id'] && $current_order->status == 'pending') {
+        // Update order status to cancelled
+        $data = [
+            'status' => 'cancelled',
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->db->update('orders', $order_id, $data)) {
+            setMessage('success', 'Your order has been cancelled.');
+            redirect('OrderController/orderHistory');
+        } else {
+            setMessage('error', 'Could not cancel the order.');
+            redirect('OrderController/orderHistory');
+        }
+    } else {
+        setMessage('error', 'You cannot cancel this order.');
+        redirect('OrderController/orderHistory');
+    }
+}
 
 }
