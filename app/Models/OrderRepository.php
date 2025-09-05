@@ -104,11 +104,11 @@ class OrderRepository
     return $results;
 }
 
-public function getLastOrderDateByUserId($userId)
-{
+    public function getLastOrderDateByUserId($userId)
+    {
     $this->db->query('SELECT created_at FROM orders WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 1');
     $this->db->bind(':user_id', $userId);
-    
+
     $row = $this->db->single();
 
     if ($this->db->rowCount() > 0) {
@@ -116,5 +116,20 @@ public function getLastOrderDateByUserId($userId)
     } else {
         return null;
     }
+    }
+
+    public function getCancelledOrderCountByUserId($userId){
+        $this->db->query("select count(*) as total_cancelled from orders where user_id =:user_id and status = 'cancelled'");
+        $this->db->bind(':user_id', $userId);
+        return $this->db->single()->total_cancelled;
+    }
+
+    public function getAllOrdersByUserId($userId)
+{
+    $this->db->query("SELECT * FROM orders WHERE user_id = :user_id ORDER BY created_at DESC");
+    $this->db->bind(':user_id', $userId);
+    return $this->db->findAll();
 }
+
+
 }

@@ -13,6 +13,8 @@ class OrderController extends Controller
         $this->db = new Database();
         $this->orderRepository = new OrderRepository();
     }
+
+    
     public function userInvoice($id) {
         // This method works correctly because it receives an order ID
         $order = $this->orderRepository->getOrderWithItems($id);
@@ -59,14 +61,54 @@ class OrderController extends Controller
 }
 
 
-public function orderHistory() {
-    $user_id = $_SESSION['user_id'];
+// public function orderHistory() {
+//     $user_id = $_SESSION['user_id'];
     
-    // Use the correct method name for your Database class, likely 'resultSet()'
-    $this->db->query("SELECT * FROM `user_order_history_view` WHERE user_id = :user_id ORDER BY order_date DESC");
-    $this->db->bind(':user_id', $user_id);
-    $orders = $this->db->resultSet();     
-    $this->view('user/order/history', ['orders' => $orders]);
+//     // Use the correct method name for your Database class, likely 'resultSet()'
+//     $this->db->query("SELECT * FROM `user_order_history_view` WHERE user_id = :user_id ORDER BY order_date DESC");
+//     $this->db->bind(':user_id', $user_id);
+//     $orders = $this->db->resultSet();     
+//     $this->view('user/order/history', ['orders' => $orders]);
+// }
+public function orderHistory($page = 1)
+{
+    // Define the number of orders per page
+    $ordersPerPage = 5;
+    
+    // Get the user ID from the session
+    $userId = $_SESSION['user_id'];
+
+    // Sanitize the page number, ensuring it's an integer and at least 1
+    $currentPage = filter_var($page, FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
+
+    // Calculate the offset for the SQL query
+    $offset = ($currentPage - 1) * $ordersPerPage;
+
+    // Get the total number of orders for this user
+    $this->db->query("SELECT COUNT(*) AS total_orders FROM `user_order_history_view` WHERE user_id = :user_id");
+    $this->db->bind(':user_id', $userId);
+    $totalOrders = $this->db->single()->total_orders;
+
+    // Calculate the total number of pages
+    $totalPages = ceil($totalOrders / $ordersPerPage);
+
+    // Fetch the specific set of orders for the current page
+    $this->db->query("SELECT * FROM `user_order_history_view` WHERE user_id = :user_id ORDER BY order_date DESC LIMIT :limit OFFSET :offset");
+    $this->db->bind(':user_id', $userId);
+    $this->db->bind(':limit', $ordersPerPage);
+    $this->db->bind(':offset', $offset);
+    $orders = $this->db->resultSet();
+
+    // Pass the data to the view, including all pagination variables
+    $data = [
+        'orders' => $orders,
+        'currentPage' => $currentPage,
+        'totalPages' => $totalPages,
+        'totalOrders' => $totalOrders,
+        'ordersPerPage' => $ordersPerPage
+    ];
+    
+    $this->view('user/order/history', $data);
 }
 
 
