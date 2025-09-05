@@ -28,9 +28,10 @@ public function dashboard()
     
     // Retrieve the last order date
     $lastOrderDate = $this->orderRepository->getLastOrderDateByUserId($userId);
-    
     // Format the date for display
     $formattedDate = $lastOrderDate ? date('M d, Y', strtotime($lastOrderDate)) : 'N/A';
+
+    $cancelledOrders = $this->orderRepository->getCancelledOrderCountByUserId($userId);
     
     $data = [
         'title' => 'My Dashboard',
@@ -39,7 +40,8 @@ public function dashboard()
         'recentOrders' => $recentOrders,
         'totalOrders' => $totalOrders,
         'pendingOrders' => $pendingOrders,
-        'lastOrderDate' => $formattedDate // Pass the formatted date
+        'lastOrderDate' => $formattedDate ,// Pass the formatted date
+        'cancelledOrders' => $cancelledOrders,
     ];
 
     // Load the view and pass the data.
@@ -51,25 +53,40 @@ public function orderHistory()
 {
     // Get the user ID from the session
     $userId = $_SESSION['user_id'];
-    
-    // Check if a status filter is set in the URL
-    $statusFilter = isset($_GET['status']) ? $_GET['status'] : null;
 
-    if ($statusFilter) {
-        // Call a new repository method to get orders filtered by status
-        $orders = $this->orderRepository->getOrdersByUserIdAndStatus($userId, $statusFilter);
+    // Get the status from the URL query string, defaulting to 'all' if not set
+    $status = isset($_GET['status']) ? $_GET['status'] : 'all';
+
+    // Initialize variables
+    $orders = [];
+    $pageTitle = '';
+    $pageHeading = '';
+
+    // Fetch orders based on the status parameter
+    if ($status === 'pending') {
+        $orders = $this->orderRepository->getOrdersByUserIdAndStatus($userId, 'pending');
+        $pageTitle = 'Pending Orders';
+        $pageHeading = 'Pending Orders';
+    } elseif ($status === 'cancelled') {
+        $orders = $this->orderRepository->getOrdersByUserIdAndStatus($userId, 'cancelled');
+        $pageTitle = 'Cancelled Orders';
+        $pageHeading = 'Cancelled Orders';
     } else {
-        // Get all orders for the user if no filter is set
-        $orders = $this->orderRepository->getPendingOrdersCountByUserId($userId);
+        // Default case: fetch all orders if status is not specified or is something else
+        $orders = $this->orderRepository->getAllOrdersByUserId($userId);
+        $pageTitle = 'Order History';
+        $pageHeading = 'Order History';
     }
 
     $data = [
-        'title' => 'Order History',
+        'title' => $pageTitle,
+        'heading' => $pageHeading,
         'orders' => $orders
     ];
 
-    $this->view('user/customer/orderHistory', $data);
+    $this->view('user/customer/orderHistory', $data); // Assuming this is your view file
 }
+
    
 }
 

@@ -2,7 +2,7 @@
 
 <div class="dashboard-wrapper">
     <?php require_once APPROOT . '/views/inc/sidebar.php'; ?>
-    
+
     <main class="main-content">
         <?php require_once APPROOT . '/views/inc/admin_logo.php'; ?>
 
@@ -10,10 +10,10 @@
             <div class="container-fluid my-5">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
                     <h4 class="mb-3 mb-md-0 text-dark fw-bold"><i class="fas fa-check-circle me-2 text-success"></i> Completed Orders</h4>
-                    </div>
-                
+                </div>
+
                 <?php require APPROOT . '/views/components/auth_message.php'; ?>
-                
+
                 <div class="card shadow-lg rounded-4 border-0">
                     <div class="card-body p-4">
                         <div class="table-responsive">
@@ -51,7 +51,7 @@
                                                             class="btn btn-sm btn-outline-info me-2" title="View Order Details">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
-                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -61,6 +61,42 @@
                                 <div class="alert alert-info text-center py-5 rounded-4 border-0" role="alert">
                                     <i class="fas fa-info-circle me-2"></i> No completed orders found.
                                 </div>
+                            <?php endif; ?>
+
+                            <!-- Pagination -->
+                            <?php if (isset($data['pagination']) && $data['pagination']['totalPages'] > 1): ?>
+                                <nav aria-label="Confirmed Orders Page Navigation" class="mt-4">
+                                    <ul class="pagination justify-content-center">
+                                        <?php
+                                        $currentPage = $data['pagination']['currentPage'];
+                                        $totalPages  = $data['pagination']['totalPages'];
+                                        $urlRoot = URLROOT . '/AdminController/completed';
+                                        ?>
+
+                                        <!-- Prev -->
+                                        <li class="page-item <?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
+                                            <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $currentPage - 1; ?>" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+
+                                        <!-- Page numbers -->
+                                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                            <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                                                <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $i; ?>">
+                                                    <?php echo $i; ?>
+                                                </a>
+                                            </li>
+                                        <?php endfor; ?>
+
+                                        <!-- Next -->
+                                        <li class="page-item <?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
+                                            <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $currentPage + 1; ?>" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
                             <?php endif; ?>
                         </div>
                     </div>

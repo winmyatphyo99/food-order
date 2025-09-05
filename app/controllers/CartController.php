@@ -23,62 +23,75 @@ class CartController extends Controller
     }
 
     public function addToCart()
-    {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $product_id = $_POST['product_id'];
-            $quantity_to_add = $_POST['quantity'];
+{
 
-            $this->db->query("SELECT * FROM products WHERE id = :id");
-            $this->db->bind(':id', $product_id);
-            $product = $this->db->single();
-
-            if ($product) {
-                if ($quantity_to_add <= 0) {
-                    setMessage('error', 'Quantity must be greater than zero.');
-                    redirect('Pages/menu/' . $product_id);
-                    return;
-                }
-
-                $current_cart_quantity = 0;
-                if (isset($_SESSION['cart'][$product_id])) {
-                    $current_cart_quantity = $_SESSION['cart'][$product_id]['quantity'];
-                }
-
-                $total_requested_quantity = $current_cart_quantity + $quantity_to_add;
-
-                if ($total_requested_quantity > $product->quantity) {
-                    setMessage('error', 'Not enough stock available for this product. Only ' . ($product->quantity - $current_cart_quantity) . ' left.');
-                    redirect('Pages/menu/' . $product_id);
-                    return;
-                }
-
-                if (!isset($_SESSION['cart'])) {
-                    $_SESSION['cart'] = [];
-                }
-
-                if (isset($_SESSION['cart'][$product_id])) {
-                    $_SESSION['cart'][$product_id]['quantity'] += $quantity_to_add;
-                } else {
-                    $_SESSION['cart'][$product_id] = [
-                        'id' => $product->id,
-                        'name' => $product->product_name,
-                        'price' => $product->price,
-                        'image' => $product->product_img,
-                        'quantity' => $quantity_to_add
-                    ];
-                }
-
-                setMessage('success', 'Product added to cart successfully!');
-                redirect('CartController/viewCart');
-            } else {
-                setMessage('error', 'Product not found.');
-                redirect('pages/home');
-            }
-        } else {
-            redirect('pages/home');
-        }
+    if (!isLoggedIn()) {
+        // If not logged in, set a message and redirect to the login page.
+        // You can also add a session variable to store the intended page URL
+        // so the user can be redirected back to the menu after logging in.
+        $_SESSION['redirect_to'] = URLROOT . '/CartController/addToCart'; // or the current product page
+        
+        setMessage('error', 'Please log in to add items to your cart.');
+        redirect('Auth/login');
+        return;
     }
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $product_id = $_POST['product_id'];
+        $quantity_to_add = $_POST['quantity'];
 
+        $this->db->query("SELECT * FROM products WHERE id = :id");
+        $this->db->bind(':id', $product_id);
+        $product = $this->db->single();
+
+        if ($product) {
+            // Check for valid quantity first
+            if ($quantity_to_add <= 0) {
+                setMessage('error', 'Quantity must be greater than zero.');
+                redirect('CartController/viewCart');
+                return;
+            }
+
+            $current_cart_quantity = 0;
+            if (isset($_SESSION['cart'][$product_id])) {
+                $current_cart_quantity = $_SESSION['cart'][$product_id]['quantity'];
+            }
+
+            $total_requested_quantity = $current_cart_quantity + $quantity_to_add;
+
+            if ($total_requested_quantity > $product->quantity) {
+                setMessage('error', 'Not enough stock available. Only ' . ($product->quantity - $current_cart_quantity) . ' left.');
+                redirect('CartController/viewCart');
+                return;
+            }
+
+            if (!isset($_SESSION['cart'])) {
+                $_SESSION['cart'] = [];
+            }
+
+            if (isset($_SESSION['cart'][$product_id])) {
+                $_SESSION['cart'][$product_id]['quantity'] += $quantity_to_add;
+            } else {
+                $_SESSION['cart'][$product_id] = [
+                    'id' => $product->id,
+                    'name' => $product->product_name,
+                    'price' => $product->price,
+                    'image' => $product->product_img,
+                    'quantity' => $quantity_to_add
+                ];
+            }
+
+            setMessage('success', 'Product added to cart successfully!');
+            redirect('CartController/viewCart');
+
+        } else {
+            setMessage('error', 'Product not found.');
+            redirect('CartController/viewCart');
+        }
+    } else {
+        // If the request method is not POST, redirect to the cart view
+        redirect('CartController/viewCart');
+    }
+}
     public function removeFromCart()
     {
         // The rest of the code is the same as your removeOne() method
@@ -332,8 +345,7 @@ public function addToSession()
                 'item' => $product,
                 'quantity' => $quantity
             ];
-            
-            setMessage('success', 'Item added to cart!');
+            setMessage('success', 'Please login first!');
         }
     }
     // Redirect the user back to the page they came from

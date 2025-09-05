@@ -1,85 +1,18 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
-<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
-
-<section class="container py-5">
-    <h2 class="text-center mb-5 fw-bold text-dark animate__animated animate__fadeInDown">
-        Explore Our Delicious Offerings!
-    </h2>
-
-    <div class="row g-4 justify-content-center">
-        <?php if (!empty($data['products']) && is_array($data['products'])): ?>
-            <?php foreach ($data['products'] as $product): ?>
-                <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp">
-                    <div class="card product-card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                        <div class="product-card-header position-relative">
-                            <img src="<?= URLROOT; ?>/img/products/<?php echo htmlspecialchars($product['product_img']); ?>"
-                                class="card-img-top product-image"
-                                alt="<?php echo htmlspecialchars($product['product_name']); ?>">
-                            <?php if ($product['quantity'] <= 0): ?>
-                                <span class="badge bg-danger rounded-pill position-absolute top-0 end-0 mt-3 me-3 animate__animated animate__bounceIn">OUT OF STOCK</span>
-                            <?php endif; ?>
-                            <?php // Optional: Add a "New" or "Popular" badge if applicable
-                            /*
-                            <span class="badge bg-success rounded-pill position-absolute top-0 start-0 mt-3 ms-3">NEW</span>
-                            */ ?>
-                        </div>
-
-                        <div class="card-body d-flex flex-column p-4">
-                            <h5 class="card-title fw-bold text-dark mb-2 fs-4">
-                                <?php echo htmlspecialchars($product['product_name']); ?>
-                            </h5>
-                            <p class="card-text text-muted mb-3 flex-grow-1 line-clamp-3">
-                                <?php echo htmlspecialchars($product['description']); ?>
-                            </p>
-
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <p class="fw-bold fs-3 text-warning mb-0 price-tag">
-                                    $<?php echo htmlspecialchars(number_format($product['price'], 2)); ?>
-                                </p>
-                                <?php if (isset($_SESSION['user_id'])): ?>
-                                    <form action="<?= URLROOT; ?>/CartController/addToCart" method="POST" class="d-flex align-items-center">
-                                        <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
-                                        <div class="input-group input-group-sm me-2 quantity-input-group">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
-                                            <input type="number"
-                                                name="quantity"
-                                                class="form-control text-center quantity-field"
-                                                value="1"
-                                                min="1"
-                                                max="<?= htmlspecialchars($product['quantity']); ?>"
-                                                style="width: 50px;">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
-                                        </div>
-                                        <button type="submit" class="btn btn-warning add-to-cart-btn fw-bold" <?php echo ($product['quantity'] <= 0) ? 'disabled' : ''; ?>>
-                                            <i class="fas fa-cart-plus me-1"></i> Add
-                                        </button>
-                                    </form>
-                                <?php else: ?>
-                                    <form action="<?= URLROOT; ?>/CartController/addToSession" method="POST" class="d-flex align-items-center">
-                                        <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
-                                        <input type="number" name="quantity" class="form-control text-center quantity-field" value="1" min="1" max="<?= htmlspecialchars($product['quantity']); ?>" style="width: 50px;">
-                                        <button type="submit" class="btn btn-warning add-to-cart-btn fw-bold">
-                                            <i class="fas fa-cart-plus me-1"></i> Add
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12">
-                <div class="alert alert-info text-center py-5 rounded-4 border-0 animate__animated animate__fadeIn" role="alert">
-                    <i class="fas fa-info-circle me-2 fs-4"></i><br>
-                    <p class="mb-0 mt-2 fs-5">No delicious items found in this category right now. Check back soon!</p>
-                </div>
-            </div>
-        <?php endif; ?>
-    </div>
-</section>
-
 <style>
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f4f7f9;
+    }
+
+    .main-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        /* Default to full width on small screens */
+    }
+
     /* Google Fonts for better typography */
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap');
 
@@ -282,5 +215,100 @@
         }
     }
 </style>
+    <div class="dashboard-wrapper">
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
+        <?php endif ?>
+        
+        <div class="main-content">
+            <section class="container py-5">
+                <h2 class="text-center mb-5 fw-bold text-dark animate__animated animate__fadeInDown">
+                    Explore Our Delicious Offerings!
+                </h2>
+
+                <div class="row g-4 justify-content-center">
+                    <?php if (!empty($data['products']) && is_array($data['products'])): ?>
+                        <?php foreach ($data['products'] as $product): ?>
+                            <div class="col-12 col-md-6 col-lg-4 animate__animated animate__fadeInUp">
+                                <div class="card product-card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                    <div class="product-card-header position-relative">
+                                        <img src="<?= URLROOT; ?>/img/products/<?php echo htmlspecialchars($product['product_img']); ?>"
+                                            class="card-img-top product-image"
+                                            alt="<?php echo htmlspecialchars($product['product_name']); ?>">
+                                        <?php if ($product['quantity'] <= 0): ?>
+                                            <span
+                                                class="badge bg-danger rounded-pill position-absolute top-0 end-0 mt-3 me-3 animate__animated animate__bounceIn">OUT
+                                                OF STOCK</span>
+                                        <?php endif; ?>
+                                        <?php // Optional: Add a "New" or "Popular" badge if applicable
+                                                /*
+                                                <span class="badge bg-success rounded-pill position-absolute top-0 start-0 mt-3 ms-3">NEW</span>
+                                                */ ?>
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column p-4">
+                                        <h5 class="card-title fw-bold text-dark mb-2 fs-4">
+                                            <?php echo htmlspecialchars($product['product_name']); ?>
+                                        </h5>
+                                        <p class="card-text text-muted mb-3 flex-grow-1 line-clamp-3">
+                                            <?php echo htmlspecialchars($product['description']); ?>
+                                        </p>
+
+                                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                                            <p class="fw-bold fs-3 text-warning mb-0 price-tag">
+                                                $<?php echo htmlspecialchars(number_format($product['price'], 2)); ?>
+                                            </p>
+                                            <?php if (isset($_SESSION['user_id'])): ?>
+                                                <form action="<?= URLROOT; ?>/CartController/addToCart" method="POST"
+                                                    class="d-flex align-items-center">
+                                                    <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
+                                                    <div class="input-group input-group-sm me-2 quantity-input-group">
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                            onclick="this.nextElementSibling.stepDown()">-</button>
+                                                        <input type="number" name="quantity"
+                                                            class="form-control text-center quantity-field" value="1" min="1"
+                                                            max="<?= htmlspecialchars($product['quantity']); ?>"
+                                                            style="width: 50px;">
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                            onclick="this.previousElementSibling.stepUp()">+</button>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-warning add-to-cart-btn fw-bold" <?php echo ($product['quantity'] <= 0) ? 'disabled' : ''; ?>>
+                                                        <i class="fas fa-cart-plus me-1"></i> Add
+                                                    </button>
+                                                </form>
+                                            <?php else: ?>
+                                                <form action="<?= URLROOT; ?>/CartController/addToSession" method="POST"
+                                                    class="d-flex align-items-center">
+                                                    <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
+                                                    <input type="number" name="quantity"
+                                                        class="form-control text-center quantity-field" value="1" min="1"
+                                                        max="<?= htmlspecialchars($product['quantity']); ?>" style="width: 50px;">
+                                                    <button type="submit" class="btn btn-warning add-to-cart-btn fw-bold">
+                                                        <i class="fas fa-cart-plus me-1"></i> Add
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12">
+                            <div class="alert alert-info text-center py-5 rounded-4 border-0 animate__animated animate__fadeIn"
+                                role="alert">
+                                <i class="fas fa-info-circle me-2 fs-4"></i><br>
+                                <p class="mb-0 mt-2 fs-5">No delicious items found in this category right now. Check back
+                                    soon!</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+
 
 <?php require_once APPROOT . '/views/user/inc/footer.php'; ?>

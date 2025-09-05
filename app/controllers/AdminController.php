@@ -6,15 +6,16 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->db = new Database();
-         $this->userRepository = new UserRepository();
+        $this->userRepository = new UserRepository();
     }
-   
-     public function profile() {
+
+    public function profile()
+    {
         $user = $this->userRepository->getUserById($_SESSION['user_id']);
         $this->view('admin/adminprofile/profile', ['user' => $user]);
     }
 
-      public function editProfile()
+    public function editProfile()
     {
 
         $userId = $_SESSION['user_id'];
@@ -93,9 +94,9 @@ class AdminController extends Controller
             'recentInvoices' => $recentInvoices,
             'revenueToday' => $orderRepository->getTodayRevenue(),
             'pending_orders' => $total_pending_orders,
-            'completedOrdersCount' => $orderRepository->countConfirmedOrders(), 
-            'totalOrdersCount' => $orderRepository->getTotalOrdersCount(), 
-            
+            'completedOrdersCount' => $orderRepository->countConfirmedOrders(),
+            'totalOrdersCount' => $orderRepository->getTotalOrdersCount(),
+
         ];
 
 
@@ -152,19 +153,72 @@ class AdminController extends Controller
         }
     }
 
+    // public function home()
+    // {
+    //     $this->db->query("SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at DESC");
+    //     $this->db->execute();
+    //     $pending_orders = $this->db->findAll();
+    //     $this->view('admin/order/pending', ['orders' => $pending_orders]);
+    // }
     public function home()
-    {
-        $this->db->query("SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at DESC");
-        $this->db->execute();
-        $pending_orders = $this->db->findAll();
-        $this->view('admin/order/pending', ['orders' => $pending_orders]);
-    }
+{
+    // pagination settings
+    $limit = 7;
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1) $page = 1;
+    $offset = ($page - 1) * $limit;
+
+    // get total records
+    $this->db->query("SELECT COUNT(*) as total FROM orders WHERE status = 'pending'");
+    $row = $this->db->single();
+    $total = is_object($row) ? $row->total : $row['total']; 
+    $totalPages = ceil($total / $limit);
+
+    // get paginated orders
+    $this->db->query("SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+    $this->db->bind(':limit', $limit, PDO::PARAM_INT);
+    $this->db->bind(':offset', $offset, PDO::PARAM_INT);
+    $pending_orders = $this->db->resultSet();
+
+    // send to view
+    $this->view('admin/order/pending', [
+        'orders' => $pending_orders,
+        'pagination' => [
+            'currentPage' => $page,
+            'totalPages'  => $totalPages
+        ]
+    ]);
+}
+
+
 
     public function completed()
-    {
-        $this->db->query("SELECT * FROM orders WHERE status = 'confirmed' ORDER BY created_at DESC");
-        $this->db->execute();
-        $completed_orders = $this->db->findAll();
-        $this->view('admin/order/completed', ['orders' => $completed_orders]);
-    }
+{
+    // pagination settings
+    $limit = 7; // number of orders per page
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1) $page = 1;
+    $offset = ($page - 1) * $limit;
+
+    // total confirmed orders
+    $this->db->query("SELECT COUNT(*) as total FROM orders WHERE status = 'confirmed'");
+    $row = $this->db->single();
+    $total = is_object($row) ? $row->total : $row['total'];
+    $totalPages = ceil($total / $limit);
+
+    // fetch paginated confirmed orders
+    $this->db->query("SELECT * FROM orders WHERE status = 'confirmed' ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+    $this->db->bind(':limit', $limit, PDO::PARAM_INT);
+    $this->db->bind(':offset', $offset, PDO::PARAM_INT);
+    $completed_orders = $this->db->resultSet();
+
+    // send to view
+    $this->view('admin/order/completed', [
+        'orders' => $completed_orders,
+        'pagination' => [
+            'currentPage' => $page,
+            'totalPages'  => $totalPages
+        ]
+    ]);
+}
 }

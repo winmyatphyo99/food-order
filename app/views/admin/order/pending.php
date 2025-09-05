@@ -67,6 +67,41 @@
                                     <i class="fas fa-info-circle me-2"></i> No pending orders found.
                                 </div>
                             <?php endif; ?>
+                            <!-- Pagination -->
+<?php if (isset($data['pagination']) && $data['pagination']['totalPages'] > 1): ?>
+    <nav aria-label="Order Page Navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <?php
+            $currentPage = $data['pagination']['currentPage'];
+            $totalPages  = $data['pagination']['totalPages'];
+            $urlRoot = URLROOT . '/AdminController/home'; 
+            ?>
+            
+            <!-- Prev Button -->
+            <li class="page-item <?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $currentPage - 1; ?>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                    <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $i; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                </li>
+            <?php endfor; ?>
+
+            <!-- Next Button -->
+            <li class="page-item <?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo $urlRoot; ?>?page=<?php echo $currentPage + 1; ?>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+<?php endif; ?>
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,20 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
-<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
+<style> .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f4f7f9;
+    }
 
-<div class="container my-5">
+    .main-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        /* Default to full width on small screens */
+    }</style>
+<div class="dashboard-wrapper">
+    <?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
+    <div class="main-content">
+        <div class="container my-5">
     <h3 class="mb-4">My Account</h3>
 
     <!-- Tabs -->
@@ -125,8 +138,11 @@
         </div>
 
     </div>
+    </div>
+    
+</div>
 </div>
 
-<!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
 <?php require_once APPROOT . '/views/user/inc/footer.php'; ?>

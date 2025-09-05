@@ -1,23 +1,28 @@
-<?php 
-    require_once APPROOT . '/views/inc/header.php'; 
-    
-    
-    // Initialize subtotal and calculate it from the fetched items
-    $subtotal = 0;
-    if (!empty($data['items'])) {
-        foreach ($data['items'] as $item) {
-            $subtotal += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
-        }
+<?php
+if ($data['role'] === 'admin'): ?>
+    <?php require_once APPROOT . '/views/inc/header.php'; ?>
+<?php elseif ($data['role'] === 'user'): ?>
+    <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
+<?php endif; 
+
+// Initialize subtotal and calculate it from the fetched items
+$subtotal = 0;
+if (!empty($data['items'])) {
+    foreach ($data['items'] as $item) {
+        $subtotal += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
     }
-    // Get the fees and calculate the grand total
-    $deliveryFee = $data['order']->delivery_fee ?? 0;
-    $taxAmount = $data['order']->tax_amount ?? 0;
-    $grandTotal = $subtotal + $deliveryFee + $taxAmount;
+}
+// Get the fees and calculate the grand total
+$deliveryFee = $data['order']->delivery_fee ?? 0;
+$taxAmount = $data['order']->tax_amount ?? 0;
+$grandTotal = $subtotal + $deliveryFee + $taxAmount;
 ?>
 
 <div class="dashboard-wrapper">
     <?php if ($data['role'] === 'admin'): ?>
         <?php require_once APPROOT . '/views/inc/sidebar.php'; ?>
+    <?php elseif ($data['role'] === 'user'): ?>
+        <?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
     <?php endif; ?>
 
     <main class="main-content">
@@ -33,19 +38,19 @@
                     </h4>
                     <div>
                         <?php if ($data['role'] === 'admin'): ?>
-                            <a href="<?php echo URLROOT; ?>/OrderController/index" 
-                               class="btn btn-outline-secondary px-4 me-2">
-                               <i class="fas fa-arrow-left me-2"></i> Back to Orders
+                            <a href="<?php echo URLROOT; ?>/OrderController/index"
+                                class="btn btn-outline-secondary px-4 me-2">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Orders
                             </a>
                         <?php else: ?>
-                            <a href="<?php echo URLROOT; ?>/OrderController/orderHistory" 
-                               class="btn btn-outline-secondary px-4 me-2">
-                               <i class="fas fa-list me-2"></i> My Orders
+                            <a href="<?php echo URLROOT; ?>/OrderController/orderHistory"
+                                class="btn btn-outline-secondary px-4 me-2">
+                                <i class="fas fa-list me-2"></i> My Orders
                             </a>
                         <?php endif; ?>
 
                         <button onclick="printInvoice()" class="btn btn-primary px-4">
-                            <i class="fas fa-print me-2"></i> 
+                            <i class="fas fa-print me-2"></i>
                             <?php echo ($data['role'] === 'admin') ? 'Print Official Copy' : 'Print'; ?>
                         </button>
                     </div>
@@ -62,7 +67,7 @@
                                         </p>
                                     </div>
                                     <div class="col-md-6 text-md-end">
-                                        <h5 class="mb-1 text-dark fw-bold">Your Restaurant Name</h5>
+                                        <h5 class="mb-1 text-dark fw-bold"><?php echo SITENAME; ?></h5>
                                         <p class="mb-0 text-muted">123 Main Street, Yangon</p>
                                         <p class="mb-0 text-muted">Phone: (123) 456-7890</p>
                                         <p class="mb-0 text-muted">
@@ -81,23 +86,23 @@
                                     </div>
                                     <div class="col-md-6 mt-4 mt-md-0 text-md-end">
                                         <h6 class="text-dark fw-bold mb-2">Order Information:</h6>
-                                        <p class="mb-0"><span class="text-muted me-2">Order ID:</span> 
+                                        <p class="mb-0"><span class="text-muted me-2">Order ID:</span>
                                             <span class="fw-bold">#<?php echo htmlspecialchars($data['order']->order_id ?? 'N/A'); ?></span>
                                         </p>
-                                        <p class="mb-0"><span class="text-muted me-2">Payment:</span> 
+                                        <p class="mb-0"><span class="text-muted me-2">Payment:</span>
                                             <?php echo htmlspecialchars($data['order']->payment_method_name ?? 'N/A'); ?>
                                         </p>
                                         <p class="mb-0">
                                             <span class="text-muted me-2">Status:</span>
                                             <?php
-                                                $status = strtolower($data['order']->status_name ?? 'unknown');
-                                                $badge_class = match ($status) {
-                                                    'pending'   => 'bg-warning text-dark',
-                                                    'confirmed' => 'bg-primary',
-                                                    'completed' => 'bg-success',
-                                                    'cancelled' => 'bg-danger',
-                                                    default     => 'bg-secondary',
-                                                };
+                                            $status = strtolower($data['order']->status_name ?? 'unknown');
+                                            $badge_class = match ($status) {
+                                                'pending'   => 'bg-warning text-dark',
+                                                'confirmed' => 'bg-primary',
+                                                'completed' => 'bg-success',
+                                                'cancelled' => 'bg-danger',
+                                                default     => 'bg-secondary',
+                                            };
                                             ?>
                                             <span class="badge <?php echo $badge_class; ?>">
                                                 <?php echo ucfirst($status); ?>
@@ -168,10 +173,10 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
+    </main>
+</div>
 
-    <script>
+<script>
     function printInvoice() {
         let content = document.getElementById("invoiceArea").innerHTML;
         let original = document.body.innerHTML;
@@ -180,15 +185,55 @@
         document.body.innerHTML = original;
         location.reload();
     }
-    </script>
+</script>
 
-    <style>
+<style>
     @media print {
-        body * { visibility: hidden; }
-        #invoiceArea, #invoiceArea * { visibility: visible; }
-        #invoiceArea { position: absolute; left: 0; top: 0; width: 100%; }
-        .d-print-none { display: none !important; }
-    }
-    </style>
+        body * {
+            visibility: hidden;
+        }
 
-    <?php require_once APPROOT . '/views/inc/footer.php'; ?>
+        #invoiceArea,
+        #invoiceArea * {
+            visibility: visible;
+        }
+
+        #invoiceArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .d-print-none {
+            display: none !important;
+        }
+    }
+</style>
+<?php if ($data['role'] === 'user'): ?>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f9;
+        color: #495057;
+        overflow-x: hidden;
+    }
+
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .main-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+<?php endif; ?>
+
+ <?php if ($data['role'] === 'user'): ?>
+           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <?php endif; ?>
+
+<?php require_once APPROOT . '/views/inc/footer.php'; ?>

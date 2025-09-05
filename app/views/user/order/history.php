@@ -1,8 +1,25 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
-<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
+<style>
+body {
+    background-color: #f4f7f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-<div class="container my-5">
-    <div class="card shadow-lg border-0 rounded-4">
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    padding: 30px;
+}
+</style>
+<div class="dashboard-wrapper">
+    <?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
+    <div class="main-content">
+        <div class="container my-5">
+          <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body p-4">
             <h3 class="card-title text-center fw-bold mb-4 text-primary">My Order History</h3>
             <hr class="mb-4">
@@ -68,10 +85,48 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+    <div class="text-muted small">
+        Showing
+        <strong><?php echo htmlspecialchars(($data['currentPage'] - 1) * $data['ordersPerPage'] + 1); ?></strong>
+        to
+        <strong><?php echo htmlspecialchars(min($data['currentPage'] * $data['ordersPerPage'], $data['totalOrders'])); ?></strong>
+        of
+        <strong><?php echo htmlspecialchars($data['totalOrders']); ?></strong>
+        entries
+    </div>
+    <nav aria-label="Order history page navigation">
+        <ul class="pagination mb-0">
+            <li class="page-item <?php echo ($data['currentPage'] <= 1) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo URLROOT; ?>/OrderController/orderHistory/<?php echo htmlspecialchars($data['currentPage'] - 1); ?>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            
+            <?php for ($i = 1; $i <= $data['totalPages']; $i++): ?>
+                <li class="page-item <?php echo ($i == $data['currentPage']) ? 'active' : ''; ?>">
+                    <a class="page-link" href="<?php echo URLROOT; ?>/OrderController/orderHistory/<?php echo htmlspecialchars($i); ?>">
+                        <?php echo htmlspecialchars($i); ?>
+                    </a>
+                </li>
+            <?php endfor; ?>
+
+            <li class="page-item <?php echo ($data['currentPage'] >= $data['totalPages']) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo URLROOT; ?>/OrderController/orderHistory/<?php echo htmlspecialchars($data['currentPage'] + 1); ?>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+    
+</div>
+
+
 <?php require_once APPROOT . '/views/user/inc/footer.php'; ?>

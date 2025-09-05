@@ -1,7 +1,157 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
-<?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
+<style>/* ------------------------------
+   Global Layout
+---------------------------------*/
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f6f9;
+}
 
-<div class="container py-5" style="background-color: #f8f9fa;">
+body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--dark);
+        line-height: 1.6;
+    }
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* ------------------------------
+   Cart Page Styling
+---------------------------------*/
+h2 {
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.list-group {
+    border: none;
+    background: transparent;
+}
+
+.list-group-item {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.list-group-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+/* Card header toggle button */
+.card-body > button {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.card-body > button i {
+    transition: transform 0.3s ease;
+}
+
+.card-body > button[aria-expanded="true"] i {
+    transform: rotate(180deg); /* Rotate arrow when open */
+}
+
+/* Product Image */
+.list-group-item img {
+    border: 2px solid #eee;
+    transition: border-color 0.3s;
+}
+.list-group-item img:hover {
+    border-color: #007bff;
+}
+
+/* Product Name & Price */
+.list-group-item h5 {
+    font-size: 1.1rem;
+    color: #212529;
+}
+.list-group-item span.text-muted {
+    font-size: 0.9rem;
+}
+
+/* Quantity Input Group */
+.input-group .btn {
+    border: none;
+    background-color: #f1f3f5;
+    transition: background 0.2s;
+}
+.input-group .btn:hover {
+    background-color: #e9ecef;
+}
+.quantity-input {
+    max-width: 60px;
+    font-weight: 600;
+}
+
+/* Subtotal Price */
+.subtotal-price {
+    font-size: 1rem;
+    color: #28a745;
+}
+
+/* Remove Button */
+.remove-form button {
+    transition: background 0.2s, color 0.2s;
+}
+.remove-form button:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* ------------------------------
+   Empty Cart Message
+---------------------------------*/
+.alert {
+    max-width: 500px;
+    margin: auto;
+    border-radius: 15px;
+}
+
+/* ------------------------------
+   Order Summary Card
+---------------------------------*/
+.card {
+    border-radius: 20px;
+    overflow: hidden;
+}
+.card-body h4 {
+    font-size: 1.3rem;
+    color: #444;
+}
+#cart-subtotal, #cart-total {
+    font-size: 1.1rem;
+}
+
+/* Order Summary Buttons */
+.card .btn {
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+/* Continue Shopping */
+.card .btn-light {
+    border: 1px solid #ddd;
+}
+.card .btn-light:hover {
+    background-color: #f8f9fa;
+}
+
+/* Sticky Sidebar */
+.sticky-top {
+    z-index: 1020;
+}
+</style>
+<div class="dashboard-wrapper">
+    <?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
+    <div class="main-content">
+        <div class="container py-5" style="background-color: #f8f9fa;">
     <div class="row">
         <div class="col-lg-8 mb-4">
             <h2 class="fw-bold mb-4 text-dark">🛍 Your Cart</h2>
@@ -74,9 +224,24 @@
 
         <?php if (isset($data['cart']) && !empty($data['cart'])) : ?>
         <div class="col-lg-4">
-            <div class="card shadow-lg rounded-4 border-0 sticky-top" style="top: 90px;">
-                <div class="card-body p-4">
-                    <h4 class="fw-bold mb-4">Order Summary</h4>
+    <div class="card shadow-lg rounded-4 border-0 sticky-top" style="top: 90px;">
+        <div class="card-body p-0">
+            
+            <!-- Dropdown Toggle inside the card header -->
+            <button class="btn w-100 text-start fw-bold d-flex justify-content-between align-items-center p-3 rounded-top-4"
+                    type="button" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#orderSummaryCollapse" 
+                    aria-expanded="true" 
+                    aria-controls="orderSummaryCollapse"
+                    style="background-color:#ffc107; border: none;">
+                <span><i class="fas fa-receipt me-2"></i> Order Summary</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+
+            <!-- Collapsible Content -->
+            <div class="collapse show" id="orderSummaryCollapse">
+                <div class="p-4">
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Subtotal</span>
                         <span class="fw-semibold" id="cart-subtotal">$<?php echo number_format($total, 2); ?></span>
@@ -107,9 +272,16 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
         <?php endif; ?>
     </div>
 </div>
+    </div>
+    
+</div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -143,5 +315,5 @@
         });
     });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <?php require_once APPROOT . '/views/user/inc/footer.php'; ?>
