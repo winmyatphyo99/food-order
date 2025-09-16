@@ -1,13 +1,18 @@
 <?php
-
+require_once APPROOT . '/repositories/BaseRepository.php';
+require_once APPROOT . '/repositories/ProductRepository.php';
+require_once APPROOT . '/repositories/RatingRepository.php';
 class Pages extends Controller
 {
-    
-
+    private $productRepository;
+    private $ratingRepository;
     private $db;
     public function __construct()
     {
         $this->db = new Database();
+        $this->productRepository = new ProductRepository($this->db);
+        $this->ratingRepository = new RatingRepository($this->db);
+        $this->model('UserModel');
        
     }
 
@@ -32,107 +37,34 @@ class Pages extends Controller
     {
         $this->view('pages/about');
     }
+    
 
-   public function home()
+
+public function home($id = null)
 {
-   
-    // Query the V_best_selling_products view to get the top 6 items
+    // Products filtered by the selected category
+    $products = $this->db->getProductsByCategoryId($id);
+
+    // All categories for the top section
+    $categories = $this->db->readAll('categories');
+
+    //  Fetch best selling products again
     $this->db->query("SELECT * FROM V_best_selling_products LIMIT 6");
     $hotProducts = $this->db->resultSet();
 
+    //  Fetch testimonials if they’re also used in the home view
+    $testimonials = $this->ratingRepository->getTestimonials();
+
     $data = [
-        'hotProducts' => $hotProducts
+        'products'     => $products,
+        'categories'   => $categories,
+        'hotProducts'  => $hotProducts,   
+        'testimonials' => $testimonials, 
+        'selectedId'   => $id
     ];
+
     $this->view('pages/home', $data);
 }
-
-  
-//     public function menu($category_id = null)
-// {
-   
-//     // Fetch all categories to display the category links
-//     $categories = $this->db->readAll('categories');
-
-//      // Fetch products based on the category_id.
-//     if ($category_id) {
-//         $this->db->query("SELECT * FROM products WHERE category_id = :category_id");
-//         $this->db->bind(':category_id', $category_id);
-//         $products = $this->db->resultSet();
-//     } else {
-//         // If no category is selected, show all products
-//         $products = $this->db->readAll('products');
-//     }
-
-
-//     // 2. Prepare the data for the view
-    
-//     $data = [
-//         'categories' => $categories,
-//         'products' => $products,
-//         'selected_category_id' => $category_id
-//     ];
-//     $this->view('user/product/category', $data);
-// }
-public function menu($category_id = null)
-{
-    // Pagination setup
-    $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-    $itemsPerPage = 9; // Number of products to show per page
-    $offset = ($page - 1) * $itemsPerPage;
-
-    // Fetch all categories to display the category links
-    $categories = $this->db->readAll('categories');
-
-    // Build the base query and count query
-    $baseQuery = "SELECT * FROM products";
-    $countQuery = "SELECT COUNT(*) FROM products";
-    $conditions = [];
-    $bindings = [];
-
-    // Add category filter if a category is selected
-    if ($category_id) {
-        $conditions[] = "category_id = :category_id";
-        $bindings[':category_id'] = $category_id;
-    }
-
-    // Combine conditions into the WHERE clause
-    if (!empty($conditions)) {
-        $whereClause = " WHERE " . implode(" AND ", $conditions);
-        $baseQuery .= $whereClause;
-        $countQuery .= $whereClause;
-    }
-
-    // Execute the count query to get the total number of products
-    $this->db->query($countQuery);
-    foreach ($bindings as $key => $value) {
-        $this->db->bind($key, $value);
-    }
-    $totalProducts = (int)$this->db->single()->{'COUNT(*)'};
-    $totalPages = ceil($totalProducts / $itemsPerPage);
-
-    // Fetch the products for the current page
-    $baseQuery .= " LIMIT :limit OFFSET :offset";
-    $this->db->query($baseQuery);
-    foreach ($bindings as $key => $value) {
-        $this->db->bind($key, $value);
-    }
-    $this->db->bind(':limit', $itemsPerPage);
-    $this->db->bind(':offset', $offset);
-    $products = $this->db->resultSet();
-
-    // Prepare the data for the view
-    $data = [
-        'categories' => $categories,
-        'products' => $products,
-        'selected_category_id' => $category_id,
-        'currentPage' => $page,
-        'totalPages' => $totalPages,
-        'totalProducts' => $totalProducts
-    ];
-
-    $this->view('user/product/category', $data);
-}
-
 
     public function menuCategory()
     {
@@ -143,5 +75,46 @@ public function menu($category_id = null)
     ];
         $this->view('user/category/index', $data);
     }
+
+
+
+public function menu($categoryId = null) {
+    // Get current page from URL or default to 1
+    $currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+    
+    // Get search query from URL or default to empty
+    $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
+    
+    // Get sort order from URL or default to 'newest'
+    $sortOrder = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+    
+    $itemsPerPage = 8;
+    $offset = ($currentPage - 1) * $itemsPerPage;
+
+    // Use the updated repository method
+    $productsData = $this->productRepository->getProductsWithPagination(
+        $categoryId, 
+        $itemsPerPage, 
+        $offset, 
+        $searchQuery,
+        $sortOrder
+    );
+
+    $totalProducts = $productsData['total_products'];
+    $products = $productsData['products'];
+    $totalPages = ceil($totalProducts / $itemsPerPage);
+
+    $data = [
+        'products' => $products,
+        'categories' => $this->productRepository->getCategories(),
+        'selected_category_id' => $categoryId,
+        'currentPage' => $currentPage,
+        'totalPages' => $totalPages,
+        'searchQuery' => $searchQuery, // Pass search query to the view for the input value
+        'sortOrder' => $sortOrder // Pass sort order to the view for the button text
+    ];
+
+    $this->view('user/product/category', $data);
+}
 
 }

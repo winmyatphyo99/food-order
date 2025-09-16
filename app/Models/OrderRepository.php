@@ -131,5 +131,19 @@ class OrderRepository
     return $this->db->findAll();
 }
 
+public function getRecentOrdersWithImages($userId) {
+    $sql = "SELECT * FROM recent_orders_with_images WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 5";
+    $this->db->query($sql);
+    $this->db->bind(':user_id', $userId);
+    $this->db->execute();
+    return $this->db->findAll();
+}
+
+public function getSalesDataLast7Days() {
+   $this->db->query("SELECT DATE(created_at) as date, SUM(grand_total) as total_sales FROM invoices WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(created_at) ORDER BY date ASC");
+    return $this->db->resultSet();
+}
+
+
 
 }

@@ -132,10 +132,11 @@ public function orderHistory($page = 1)
         // Prepare the data to pass to the view, including pagination info
         $data = [
             'orders' => $orders,
+            'totalOrders' => $totalOrders,
             'pagination' => [
                 'currentPage' => $currentPage,
                 'totalPages' => $totalPages,
-                'totalOrders' => $totalOrders
+                
             ]
         ];
         

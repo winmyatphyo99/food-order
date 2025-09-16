@@ -1,376 +1,283 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
+<section class="main-content">
+  <section class="hero-section container-fluid">
+      <div class="row align-items-center">
 
-<style>
-    :root {
-        --primary-color: #5e8bbb;
-        /* Darker Blue for a richer feel */
-        --secondary-color: #e3e8edff;
-        /* Muted Gray for text */
-        --accent-color: #28a745;
-        /* Vibrant Green for emphasis */
-        --dark-bg: #343a40;
-        /* Dark Charcoal */
-        --light-bg: #f8f9fa;
-        /* White Smoke */
-        --text-light: #ffffff;
-        --text-dark: #333333;
-    }
+          <div class="col-md-6 d-flex align-items-center justify-content-center">
+              <div class="hero-content text-center p-5">
+                  <h1 class="hero-title">
+                      Order Food, Get Instant Invoice
+                  </h1>
+                  <p class="hero-subtitle">
+                      Delicious meals, quick delivery, and detailed invoices for every order.
+                  </p>
 
-    /* General Body and Typography */
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: var(--light-bg);
-        color: var(--text-dark);
-    }
+                  <form action="<?= URLROOT; ?>/Pages/menu" method="GET" class="search-form">
+                      <div class="search-box shadow">
+                          <input type="text" name="query" placeholder="🔍 Search dishes, drinks, or desserts...">
+                          <button type="submit">
+                              <i class="fas fa-search"></i>
+                          </button>
+                      </div>
+                  </form>
 
-    /* Header & Footer (as requested) */
-    .header-section,
-    footer {
-        background-color: var(--primary-color);
-        color: var(--text-light);
-    }
+                  <a href="<?= URLROOT; ?>/Pages/menu" class="btn hero-btn mt-3">
+                      <i class="fas fa-utensils me-2"></i> Browse Menu
+                  </a>
+              </div>
+          </div>
 
-    .header-section a {
-        color: var(--text-light);
-        transition: color 0.3s ease;
-    }
+          <div class="col-md-6 p-0">
+              <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="4000">
+                  <div class="carousel-inner">
+                      <div class="carousel-item active">
+                          <img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=1920&q=80&auto=format&fit=crop" class="d-block w-100 hero-img" alt="Food 1">
+                      </div>
+                      <div class="carousel-item">
+                          <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=1920&q=80&auto=format&fit=crop" class="d-block w-100 hero-img" alt="Food 2">
+                      </div>
+                      <div class="carousel-item">
+                          <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1920&q=80&auto=format&fit=crop" class="d-block w-100 hero-img" alt="Food 3">
+                      </div>
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                  </button>
+              </div>
+          </div>
+      </div>
+  </section>
 
-    .header-section a:hover {
-        color: var(--accent-color);
-    }
 
-    /* Hero Section */
-    .hero-section {
-        position: relative;
-        background: url('https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nzh8fHRoYWklMjBmb29kfGVufDB8fDB8fHww') center/cover no-repeat;
-        min-height: 85vh;
-        display: flex;
-        align-items: center;
-        text-align: center;
-        color: var(--text-light);
-        padding: 50px 20px;
-    }
+  <section class="cuisine-section py-5">
+      <div class="container">
+          <div class="text-center fw-bold mb-4 section-title-container">
+              <h2 class="section-title slide-marquee">Explore Our Menu by Cuisine</h2>
+          </div>
+          <p class="text-center text-muted mb-5 section-subtitle animate-fade-in-up animate-delay-200">
+              Discover a variety of delicious dishes from around the world.
+          </p>
+          <div class="row g-4 justify-content-center category-row">
+              <?php if (!empty($categories)): ?>
+                  <?php foreach ($categories as $category): ?>
+                      <div class="col-12 col-sm-6 col-md-4 col-lg-3 animate-fade-in-up" style="animation-delay: <?= 0.1 * ($category['id'] % 5 + 1) ?>s;">
+                          <a href="<?= URLROOT; ?>/ProductController/category/<?= htmlspecialchars($category['id']); ?>" class="text-decoration-none">
+                              <div class="category-card text-center p-4 h-100 position-relative">
+                                  <div class="img-wrapper mx-auto mb-3">
+                                      <img src="<?= URLROOT; ?>/img/categories/<?= htmlspecialchars($category['category_image']); ?>"
+                                          alt="<?= htmlspecialchars($category['name']); ?>" class="rounded-circle img-fluid shadow-sm">
+                                  </div>
+                                  <h5 class="fw-bold text-dark mt-3 mb-2 category-title"><?= htmlspecialchars($category['name']); ?></h5>
+                                  <p class="text-muted small-text mb-0 category-description">
+                                      <?= htmlspecialchars($category['description']); ?>
+                                  </p>
+                              </div>
+                          </a>
+                      </div>
+                  <?php endforeach; ?>
+              <?php else: ?>
+                  <div class="col-12">
+                      <p class="text-muted text-center w-100 p-5 border rounded-3 bg-white shadow-sm">No categories available at the moment. Please check back soon!</p>
+                  </div>
+              <?php endif; ?>
+          </div>
+      </div>
+  </section>
 
-    .hero-section .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        /* Dark overlay for better text contrast */
-        z-index: 1;
-    }
+  <section class="container my-5 py-5 text-center how-it-works">
+      <h2 class="fw-bold mb-5">How It Works</h2>
+      <div class="row g-5">
+          <div class="col-md-4">
+              <div class="circle-icon mx-auto shadow-sm">
+                  <i class="fas fa-map-marker-alt fa-2x"></i>
+              </div>
+              <h5 class="fw-bold">1. Find Your Place</h5>
+              <p class="text-muted">Enter your location to discover a variety of restaurants near you.</p>
+          </div>
+          <div class="col-md-4">
+              <div class="circle-icon mx-auto shadow-sm">
+                  <i class="fas fa-utensils fa-2x"></i>
+              </div>
+              <h5 class="fw-bold">2. Choose Your Meal</h5>
+              <p class="text-muted">Browse menus, read reviews, and select your perfect meal in minutes.</p>
+          </div>
+          <div class="col-md-4">
+              <div class="circle-icon mx-auto shadow-sm">
+                  <i class="fas fa-motorcycle fa-2x"></i>
+              </div>
+              <h5 class="fw-bold">3. Fast Delivery</h5>
+              <p class="text-muted">Pay securely and track your order as it's delivered straight to your door.</p>
+          </div>
+      </div>
+  </section>
 
-    .hero-content {
-        position: relative;
-        z-index: 2;
-    }
+  <section class="container my-5 py-5">
+      <h2 class="text-center fw-bold mb-5">Best Selling Items</h2>
+      <div class="row g-5">
+          <?php if (!empty($data['hotProducts'])): ?>
+              <?php foreach ($data['hotProducts'] as $product): ?>
+                  <div class="col-md-4">
+                      <div class="card product-card shadow-lg rounded-3 animate__animated animate__fadeInUp h-100">
 
-    .hero-title {
-        font-size: 3rem;
-        font-weight: 800;
-        color: var(--text-light);
-        /* White title */
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
-    }
+                          <div class="product-img-container">
+                              <img
+                                  src="<?= URLROOT . '/img/products/' . htmlspecialchars($product['product_img']); ?>"
+                                  alt="<?= htmlspecialchars($product['product_name']); ?>"
+                                  class="card-img-top">
+                              <?php if ($product['quantity'] <= 0): ?>
+                                  <span class="badge out-of-stock-badge animate__animated animate__fadeIn">
+                                      OUT OF STOCK
+                                  </span>
+                              <?php endif; ?>
+                          </div>
 
-    .hero-subtitle {
-        font-size: 1.25rem;
-        color: rgba(255, 255, 255, 0.8);
-        /* Slightly transparent white for subtitle */
-        margin-bottom: 2rem;
-    }
+                          <div class="card-body d-flex flex-column p-4">
+                              <h5 class="fw-bold text-dark mb-2"><?= htmlspecialchars($product['product_name']); ?></h5>
+                              <p class="product-description text-muted small mb-3">
+                                  <?= htmlspecialchars($product['description']); ?>
+                              </p>
+                              <p class="fw-bold fs-4 text-primary mb-2">
+                                  $<?= htmlspecialchars($product['price']); ?>
+                              </p>
 
-    .search-box {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        /* Frosted glass effect */
-        border-radius: 50px;
-        padding: 8px 15px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        max-width: 600px;
-        margin: auto;
-    }
+                              <div class="mb-3">
+                                  <?php
+                                  $avg = isset($product['average_rating']) ? round($product['average_rating']) : 0;
+                                  $count = isset($product['rating_count']) ? $product['rating_count'] : 0;
+                                  ?>
+                                  <?php for ($i = 1; $i <= 5; $i++): ?>
+                                      <i class="fas fa-star <?= $i <= $avg ? 'text-warning' : 'text-secondary'; ?>"></i>
+                                  <?php endfor; ?>
+                                  <span class="ms-2 text-muted small">(<?= $count ?>)</span>
+                              </div>
 
-    .search-box .form-control {
-        border: none;
-        background: transparent;
-        color: var(--text-light);
-        padding: 12px 20px;
-        font-size: 1.1rem;
-        outline: none;
-        flex: 1;
-    }
+                              <form action="<?= URLROOT; ?>/CartController/addToCart" method="POST" class="mt-auto text-center">
+                                  <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
+                                  <div class="input-group justify-content-center mb-3">
+                                      <button type="button" class="btn btn-secondary-outline btn-minus">-</button>
+                                      <input
+                                          type="number"
+                                          name="quantity"
+                                          class="form-control text-center"
+                                          value="1"
+                                          min="1"
+                                          max="<?= $product['quantity']; ?>">
+                                      <button type="button" class="btn btn-secondary-outline btn-plus">+</button>
+                                  </div>
+                                  <button
+                                      type="submit"
+                                      class="btn btn-primary fw-bold w-100"
+                                      <?= ($product['quantity'] <= 0) ? 'disabled' : ''; ?>>
+                                      <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                                  </button>
+                                  
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              <?php endforeach; ?>
+          <?php else: ?>
+              <div class="col-12">
+                  <p class="text-center text-muted">No popular products found.</p>
+              </div>
+          <?php endif; ?>
+      </div>
+  </section>
 
-    .search-box .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.7);
-    }
+  <section class="container my-5 py-5 text-center bg-light rounded-3">
+      <h2 class="fw-bold mb-5">What Our Customers Say</h2>
+      <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000">
+          <div class="carousel-inner">
+              <?php if (!empty($data['testimonials'])): ?>
+                  <?php $is_first = true; ?>
+                  <?php foreach ($data['testimonials'] as $testimonial): ?>
+                      <div class="carousel-item <?= $is_first ? 'active' : ''; ?>">
+                          <div class="px-md-5">
 
-    /* .search-btn {
-        background: var(--primary-color);
-        border: none;
-        color: var(--text-light);
-        font-size: 1.2rem;
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease;
-    }
-    .search-btn:hover {
-        background-color: #003e80;
-    } */
+                              <img src="<?= URLROOT . '/uploads/profile/' . htmlspecialchars($testimonial['profile_image']); ?>" class="rounded-circle mb-3" width="80" height="80" alt="<?= htmlspecialchars($testimonial['customer_name']) ?>'s Profile Image">
+                              <p class="lead fst-italic">"<?= htmlspecialchars($testimonial['comment']) ?>"</p>
 
-    /* How It Works Section */
-    .circle-icon {
-        width: 80px;
-        height: 80px;
-        background: var(--primary-color);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        margin-bottom: 20px;
-        color: var(--text-light);
-        transition: transform 0.3s ease;
-    }
-
-    .circle-icon:hover {
-        transform: translateY(-5px);
-    }
-
-    /* Product Cards */
-    .product-card {
-        transition: all 0.3s ease;
-        border-radius: 15px;
-        background: white;
-    }
-
-    .product-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .product-img-container {
-        height: 220px;
-        overflow: hidden;
-        border-radius: 15px 15px 0 0;
-    }
-
-    .product-img-container img {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
-        transition: transform 0.4s ease;
-    }
-
-    .product-card:hover img {
-        transform: scale(1.05);
-    }
-
-    .product-card .btn {
-        background: var(--primary-color);
-        border: none;
-        color: white;
-        transition: background-color 0.3s ease;
-    }
-
-    .product-card .btn:hover {
-        background: #003e80;
-    }
-
-    /* CTA */
-    .cta-section {
-        background: var(--primary-color);
-        color: var(--text-light);
-        padding: 4rem 0;
-        border-radius: 20px;
-    }
-
-    .cta-section .btn {
-        background: var(--accent-color);
-        border: none;
-        font-weight: bold;
-        padding: 12px 40px;
-        border-radius: 50px;
-        transition: 0.3s;
-    }
-
-    .cta-section .btn:hover {
-        background: #218838;
-        transform: translateY(-2px);
-    }
-
-    /* Footer */
-    footer {
-        background: var(--primary-color);
-        color: var(--text-light);
-        padding: 3rem 0 1.5rem;
-    }
-
-    footer h5 {
-        color: var(--accent-color);
-    }
-
-    footer a {
-        color: var(--text-light);
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-
-    footer a:hover {
-        color: var(--accent-color);
-    }
-
-    .social-icons a {
-        color: var(--text-light);
-        transition: color 0.3s ease;
-    }
-
-    .social-icons a:hover {
-        color: var(--accent-color);
-    }
-
-    .newsletter-btn {
-        background-color: var(--accent-color);
-        color: var(--text-light);
-        border: none;
-    }
-
-    .newsletter-btn:hover {
-        background-color: #218838;
-    }
-</style>
-
-<div class="header-section">
-</div>
-
-<header class="hero-section d-flex align-items-center">
-    <div class="overlay"></div>
-    <div class="container text-center hero-content">
-
-        <h1 class="fw-bold display-3 mb-3 hero-title animate__animated animate__fadeInDown">
-            Your Culinary Journey Starts Here
-        </h1>
-
-        <p class="lead mb-5 hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-            Find the best food near you and get it delivered in minutes.
-        </p>
-
-        <div class="d-flex justify-content-center mb-4 animate__animated animate__zoomIn animate__delay-2s">
-            <form action="<?= URLROOT; ?>/Pages/menu" method="GET" class="search-form">
-                <div class="search-box shadow-sm">
-                    <input type="text" name="query" class="form-control" placeholder="🔍 Search dishes..." aria-label="Search food">
-                    <button class="btn search-btn" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <a href="<?= URLROOT; ?>/Pages/menu"
-            class="btn btn-outline-light btn-lg px-5 fw-bold animate__animated animate__fadeInUp animate__delay-3s">
-            <i class="fas fa-utensils me-2"></i> Browse Our Menu
-        </a>
-    </div>
-</header>
-<hr>
-
-<section class="container my-5 py-5 text-center">
-    <h2 class="fw-bold mb-5">How It Works</h2>
-    <div class="row g-5">
-        <div class="col-md-4">
-            <div class="circle-icon mx-auto shadow-sm">
-                <i class="fas fa-map-marker-alt fa-2x"></i>
-            </div>
-            <h5 class="fw-bold">1. Find Your Place</h5>
-            <p class="text-muted">Enter your location to discover a variety of restaurants near you.</p>
-        </div>
-        <div class="col-md-4">
-            <div class="circle-icon mx-auto shadow-sm">
-                <i class="fas fa-utensils fa-2x"></i>
-            </div>
-            <h5 class="fw-bold">2. Choose Your Meal</h5>
-            <p class="text-muted">Browse menus, read reviews, and select your perfect meal in minutes.</p>
-        </div>
-        <div class="col-md-4">
-            <div class="circle-icon mx-auto shadow-sm">
-                <i class="fas fa-motorcycle fa-2x"></i>
-            </div>
-            <h5 class="fw-bold">3. Fast Delivery</h5>
-            <p class="text-muted">Pay securely and track your order as it's delivered straight to your door.</p>
-        </div>
-    </div>
+                              <div class="text-warning">
+                                  <?php
+                                  $rating = (int) $testimonial['rating'];
+                                  for ($i = 1; $i <= 5; $i++):
+                                  ?>
+                                      <i class="fas fa-star <?= ($i <= $rating) ? '' : 'text-secondary'; ?>"></i>
+                                  <?php endfor; ?>
+                              </div>
+                              <p class="fw-bold mt-2">
+                                  — <?= htmlspecialchars($testimonial['customer_name']) ?>
+                                  <span class="fw-normal text-muted small ms-2">
+                                      on <?= date('M d, Y', strtotime($testimonial['rating_date'])) ?>
+                                  </span>
+                              </p>
+                          </div>
+                      </div>
+                      <?php $is_first = false; ?>
+                  <?php endforeach; ?>
+              <?php else: ?>
+                  <div class="carousel-item active">
+                      <div class="px-md-5">
+                          <p class="text-muted">No testimonials yet.</p>
+                      </div>
+                  </div>
+              <?php endif; ?>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+          </button>
+      </div>
+  </section>
 </section>
 
-<hr>
-
-<section class="container my-5 py-5">
-    <h2 class="text-center fw-bold mb-5">🔥 Popular Menu</h2>
-    <div class="row g-4">
-        <?php if (!empty($data['hotProducts'])): ?>
-            <?php foreach ($data['hotProducts'] as $product): ?>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-lg rounded-3 product-card animate__animated animate__fadeInUp">
-                        <div class="product-img-container rounded-top-3">
-                            <img
-                                src="<?= URLROOT . '/img/products/' . htmlspecialchars($product['product_img']); ?>"
-                                class="card-img-top"
-                                alt="<?= htmlspecialchars($product['product_name']); ?>">
-                        </div>
-                        <div class="card-body text-center p-4">
-                            <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($product['product_name']); ?></h5>
-                            <p class="text-muted small mb-3"><?= htmlspecialchars($product['description']); ?></p>
-                            <p class="fw-bold fs-4 text-primary mb-3">
-                                $<?= htmlspecialchars($product['price']); ?>
-                            </p>
-                             <?php if (isset($_SESSION['user_id'])): ?>
-                                <form action="<?= URLROOT; ?>/CartController/addToCart" method="POST" class="d-flex flex-column align-items-center">
-                                    <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
-                                    <div class="input-group mb-3 w-75">
-                                        <button type="button" class="btn btn-outline-secondary btn-minus">-</button>
-                                        <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="<?= $product['quantity']; ?>">
-                                        <button type="button" class="btn btn-outline-secondary btn-plus">+</button>
-                                    </div>
-                                    <button type="submit" class="btn btn-warning w-100 text-white fw-bold" <?= ($product['quantity'] <= 0) ? 'disabled' : ''; ?>>
-                                        <i class="fas fa-cart-plus me-1"></i> Order Now
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <form action="<?= URLROOT; ?>/CartController/addToSession" method="POST" class="d-flex flex-column align-items-center">
-                                    <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
-                                    <input type="hidden" name="quantity" class="form-control text-center" value="1" min="1" max="<?= $product['quantity']; ?>">
-                                    <button type="submit" class="btn btn-warning w-100 text-white fw-bold">
-                                        <i class="fas fa-cart-plus me-1"></i> Order Now
-                                    </button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12">
-                <p class="text-center text-muted">No popular products found.</p>
-            </div>
-        <?php endif; ?>
-    </div>
-</section>
-
-<hr>
-
-<section class="cta-section" style="background-color: var(--primary-color); color: var(--text-light); padding: 3rem 0;">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-3">Hungry? Get Your Order Started Now!</h2>
-        <p class="lead mb-4">Discover the best food in town, delivered right to your door in minutes.</p>
-        <a href="<?= URLROOT; ?>/Pages/menu" class="btn btn-custom-primary btn-lg px-5 fw-bold shadow">
-            <i class="fas fa-shopping-basket me-2"></i> Order Now
-        </a>
-    </div>
-</section>
-
-<hr>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <?php require_once APPROOT . '/views/user/inc/footer.php'; ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const minusBtns = document.querySelectorAll('.btn-minus');
+        const plusBtns = document.querySelectorAll('.btn-plus');
+
+        // Minus Button Click
+        minusBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.nextElementSibling; // minus -> input
+                let value = parseInt(input.value);
+                const min = parseInt(input.min) || 1;
+
+                if (value > min) {
+                    input.value = value - 1;
+                }
+            });
+        });
+
+        // Plus Button Click
+        plusBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling; // plus -> input
+                let value = parseInt(input.value);
+                const max = parseInt(input.max) || 99;
+
+                if (value < max) {
+                    input.value = value + 1;
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+

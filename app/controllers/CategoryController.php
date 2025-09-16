@@ -53,6 +53,8 @@ class CategoryController extends Controller
         $this->view('user/product/category', $data);
     }
 
+    
+
     public function create()
     {
         $this->view('admin/category/create');

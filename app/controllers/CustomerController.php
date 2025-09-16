@@ -5,6 +5,7 @@ class CustomerController extends Controller
 {
     
     protected $orderRepository;
+
       
     private $db;
     public function __construct()
@@ -15,7 +16,7 @@ class CustomerController extends Controller
         $this->orderRepository = new OrderRepository();
         
     }
-
+    
 public function dashboard()
 {
     // Get the user ID from the session.
@@ -32,6 +33,7 @@ public function dashboard()
     $formattedDate = $lastOrderDate ? date('M d, Y', strtotime($lastOrderDate)) : 'N/A';
 
     $cancelledOrders = $this->orderRepository->getCancelledOrderCountByUserId($userId);
+    $recentOrders_withImg = $this->orderRepository->getRecentOrdersWithImages($userId);
     
     $data = [
         'title' => 'My Dashboard',
@@ -42,6 +44,7 @@ public function dashboard()
         'pendingOrders' => $pendingOrders,
         'lastOrderDate' => $formattedDate ,// Pass the formatted date
         'cancelledOrders' => $cancelledOrders,
+        'recentOrders_withImg'=> $recentOrders_withImg
     ];
 
     // Load the view and pass the data.
@@ -86,6 +89,8 @@ public function orderHistory()
 
     $this->view('user/customer/orderHistory', $data); // Assuming this is your view file
 }
+
+   
 
    
 }

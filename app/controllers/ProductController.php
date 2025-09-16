@@ -1,14 +1,17 @@
 <?php
+require_once APPROOT . '/repositories/ProductRepository.php';
 
 class ProductController extends Controller
 {
     private $productModel;
+    private $productRepository; 
     private $db;
     private const PRODUCTS_PER_PAGE = 5;
 
     public function __construct()
     {
         $this->model('ProductModel');
+        $this->productRepository = $this->repository('ProductRepository');
         $this->db = new Database();
     }
     public function index(){
@@ -39,15 +42,51 @@ class ProductController extends Controller
         $this->view('admin/product/index', $data);
     }
 
-    public function category($id){
-        $products = $this->db->getProductsByCategoryId($id);
+    // public function categoryId($id){
+    //     $products = $this->db->getProductsByCategoryId($id);
 
-        $data = [
-            'products' => $products
-        ];
-        $this->view('user/product/productCategory',$data);
+    //     $data = [
+    //         'products' => $products
+    //     ];
+    //     $this->view('user/product/productCategory',$data);
 
-    }
+    // }
+
+
+
+    
+
+    public function category($id)
+{
+    // These constants can be defined at the top of your controller or in a config file
+    $itemsPerPage = 8;
+    
+    // Get the current page from the URL, defaulting to 1
+    $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+    
+    // Calculate the offset for the database query
+    $offset = ($page - 1) * $itemsPerPage;
+
+    // Use the ProductRepository to get products with pagination and ratings
+    // The ProductRepository handles the complex query with joins
+    $productsData = $this->productRepository->getProductsWithPagination($id, $itemsPerPage, $offset);
+
+    // Prepare the data to be passed to the view
+    // The productsData array contains both the products and the total count
+    $data = [
+        'products' => $productsData['products'],
+        'totalPages' => ceil($productsData['total_products'] / $itemsPerPage),
+        'currentPage' => $page,
+        'selectedCategory' => $id, // Pass the category ID to the view for pagination links
+    ];
+
+    // Load the view with the newly prepared data
+    $this->view('user/product/productCategory', $data);
+}
+
+
+
+
     public function create()
     {
         // Get categories to populate a dropdown in the create form

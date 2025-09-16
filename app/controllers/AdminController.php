@@ -1,4 +1,5 @@
 <?php
+require_once APPROOT . '/repositories/ContactRepository.php';
 class AdminController extends Controller
 {
     private $db;
@@ -14,6 +15,18 @@ class AdminController extends Controller
         $user = $this->userRepository->getUserById($_SESSION['user_id']);
         $this->view('admin/adminprofile/profile', ['user' => $user]);
     }
+
+     public function index() {
+        $repo = new ContactRepository();
+        $messages = $repo->getAll(); // Fetch all contact messages
+
+        $data = [
+            'messages' => $messages
+        ];
+
+        $this->view('admin/contact/contactmsg', $data);
+    }
+
 
     public function editProfile()
     {
@@ -56,7 +69,7 @@ class AdminController extends Controller
     {
         $userId = $_SESSION['user_id'];
         $user = $this->userRepository->getUserById($userId);
-        //  var_dump($user);exit;
+       
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
@@ -88,6 +101,7 @@ class AdminController extends Controller
         $this->db->query("SELECT COUNT(*) AS total_pending FROM orders WHERE status = 'pending'");
         $total_pending = $this->db->single();
         $total_pending_orders = $total_pending->total_pending;
+        
         // Create a data array to pass to the view
         $data = [
             'toalOrders' => $totalOrders,
@@ -96,6 +110,7 @@ class AdminController extends Controller
             'pending_orders' => $total_pending_orders,
             'completedOrdersCount' => $orderRepository->countConfirmedOrders(),
             'totalOrdersCount' => $orderRepository->getTotalOrdersCount(),
+            'salesData' =>$orderRepository->getSalesDataLast7Days(),
 
         ];
 
@@ -221,4 +236,6 @@ class AdminController extends Controller
         ]
     ]);
 }
+
+
 }

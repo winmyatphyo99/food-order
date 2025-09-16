@@ -29,20 +29,19 @@
                                     <label for="phone_number" class="form-label">Phone Number</label>
                                     <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo isset($data['user_phone_number']) ? htmlspecialchars($data['user_phone_number']): ''; ?>">
                                 </div>
-
                                 <div class="mb-3">
                                     <h6 class="font-weight-bold text-primary">Payment Method</h6>
                                     <?php if(isset($data['payments']) && is_array($data['payments'])): ?>
-                                    <?php foreach ($data['payments'] as $index => $payment) : ?>
-                                    <div class="form-check payment-option animated-field" style="animation-delay: <?php echo $index * 0.1; ?>s">
-                                        <input class="form-check-input" type="radio" name="payment_method_id" id="payment-<?php echo htmlspecialchars($payment['id']); ?>" value="<?php echo htmlspecialchars($payment['id']); ?>"<?php echo ($payment['id'] == 1 ) ? 'checked' : '' ;?>>
-                                        <label class="form-check-label" for="payment-<?php echo htmlspecialchars($payment['id']); ?>">
-                                           <?php echo htmlspecialchars($payment['payment_name']); ?>
-                                           </label>
-                                    </div>
-                                    <?php endforeach; ?>
+                                        <?php foreach ($data['payments'] as $index => $payment) : ?>
+                                            <div class="form-check payment-option animated-field" style="animation-delay: <?php echo $index * 0.1; ?>s">
+                                                <input class="form-check-input" type="radio" name="payment_method_id" id="payment-<?php echo htmlspecialchars($payment['id']); ?>" value="<?php echo htmlspecialchars($payment['id']); ?>"<?php echo ($payment['id'] == 1 ) ? 'checked' : '' ;?>>
+                                                <label class="form-check-label" for="payment-<?php echo htmlspecialchars($payment['id']); ?>">
+                                                   <?php echo htmlspecialchars($payment['payment_name']); ?>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
                                     <?php else: ?>
-                                       <p class="text-danger">No Payments Available.</p>
+                                        <p class="text-danger">No Payments Available.</p>
                                     <?php endif;?>
                                 </div>
 
@@ -64,7 +63,7 @@
                                     <?php foreach ($data['cart'] as $index => $item) : ?>
                                         <li class="list-group-item d-flex justify-content-between align-items-center animated-item" style="animation-delay: <?php echo $index * 0.07; ?>s">
                                             <div>
-                                                <h6 class="my-0"><?php echo htmlspecialchars($item['name']); ?></h6>
+                                                <h6 class="my-0"><?php echo htmlspecialchars($item['product_name']); ?></h6>
                                                 <small class="text-muted">Qty: <?php echo htmlspecialchars($item['quantity']); ?> x $<?php echo htmlspecialchars($item['price']); ?></small>
                                             </div>
                                             <span class="text-muted">$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
@@ -99,7 +98,7 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 </div>
 
 <style>
@@ -283,4 +282,5 @@ body {
 }
 </style>
 
-<?php require_once APPROOT . '/views/user/inc/footer.php'; ?>
+
+ 

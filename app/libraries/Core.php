@@ -65,6 +65,7 @@ class Core
         'Auth@login',
         'Auth@register',
         'Auth@verify',
+        
     ];
 
     $authRoutes = [
@@ -83,6 +84,7 @@ class Core
     
     $adminRoutes = [
         'AdminController@dashboard',
+        'AdminController@index',
         'AdminController@pending',
         'AdminController@confirmOrder',
         'ProductController@index',

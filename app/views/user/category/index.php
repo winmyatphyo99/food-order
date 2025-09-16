@@ -1,12 +1,11 @@
 <?php require_once APPROOT . '/views/user/inc/header.php'; ?>
-
 <style>
-/* Base Layout and Colors */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f9;
-    color: #495057;
-    overflow-x: hidden;
+    /* Customer Dashboard Category Page Styling Start */
+ body {
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
 }
 
 .dashboard-wrapper {
@@ -15,70 +14,85 @@ body {
 }
 
 .main-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
+    flex: 1;
+    padding: 0;
 }
 
-/* Content Area */
-.content-area {
-    padding: 2rem;
-    flex-grow: 1;
-}
-
-/* Original Category and Product Card Styles */
+/* Category Cards */
 .category-card {
-    border-radius: 1rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #e9ecef;
+    border-radius: 1.5rem; /* Larger border-radius */
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Softer shadow */
 }
 
 .category-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.object-fit-cover {
-    object-fit: cover;
+.category-card .card-body {
+    padding: 2.5rem; /* More padding for a cleaner look */
+}
+
+.category-card-inner {
+    display: flex;
+    flex-direction: column;
     height: 100%;
 }
 
-.btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
+.category-image-container {
+    height: 250px; /* Fixed height for image container */
+    overflow: hidden;
+    position: relative;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+}
+
+.category-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.category-card:hover img {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #666;
+}
+
+.btn-custom {
+    background-color: #ffb86c;
     color: #fff;
     font-weight: 600;
-    transition: background-color 0.3s ease;
+    padding: 0.75rem 2rem;
+    border-radius: 2rem; /* Pill-shaped button */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.btn-warning:hover {
-    background-color: #e0a800;
-    border-color: #e0a800;
+.btn-custom:hover {
+    background-color: #e6a75a;
+    transform: translateY(-2px);
 }
-
-/* === New CSS for Image Consistency === */
-.category-image-container {
-    width: 100%;
-    height: 200px; /* Set a fixed height for the container */
-    overflow: hidden; /* Ensures no content spills out */
-}
-
-.category-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* This is the key property for consistent images */
-}
-/* === End New CSS === */
-
-/* Adjustments for the new layout */
-@media (max-width: 768px) {
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-    }
-}
+/* Customer Dashboard Category Page Styling End */
 </style>
-
 <div class="dashboard-wrapper">
     <?php if (isset($_SESSION['user_id'])): ?>
             <?php require_once APPROOT . '/views/user/customer/sidebar.php'; ?>
@@ -87,7 +101,6 @@ body {
     <main class="main-content">
         <section class="container my-5">
             <h2 class="text-center mb-5 fw-bold text-dark">Our Categories</h2>
-
             <div class="row g-4">
                 <?php if (isset($data['categories']) && is_array($data['categories'])) : ?>
                     <?php foreach ($data['categories'] as $category) : ?>
@@ -126,7 +139,23 @@ body {
                 <?php endif; ?>
             </div>
         </section>
+         <?php
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Footer logic
+        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 0) {
+            // Logged-in customer
+            // require_once APPROOT . '/views/user/customer/footer.php';
+        } else {
+    // Public / guest users
+    require_once APPROOT . '/views/user/inc/footer.php';
+}
+        ?>
     </main>
+   
 </div>
 
-<?php require_once APPROOT . '/views/user/inc/footer.php'; ?>
+

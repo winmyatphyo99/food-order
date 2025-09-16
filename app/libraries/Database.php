@@ -263,9 +263,10 @@ public function findAllBy($table, $column, $value)
 
 
     // Retrieve Total Orders from database
-    public function countAll($table) {
-    $this->query("SELECT COUNT(*) as total FROM $table");
-    $row = $this->single(); 
+   public function countAll($table)
+{
+    $this->query("SELECT COUNT(*) AS total FROM $table");
+    $row = $this->single();
     return $row->total;
 }
 
@@ -410,6 +411,8 @@ public function executeStoredProcedure($procedureName, $params) {
         $this->bind(':offset', $offset, PDO::PARAM_INT);
         return $this->resultSet();
     }  
+
+    
 
     
 }

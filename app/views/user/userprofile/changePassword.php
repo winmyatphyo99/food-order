@@ -96,9 +96,11 @@
         <button type="submit" class="btn btn-success">Update Password</button>
     </form>
 </div>
+ <?php require_once APPROOT . '/views/user/customer/footer.php'; ?>
     </div>
     
 </div>
 
 
-<?php require_once APPROOT . '/views/user/inc/footer.php'; ?>
+
+

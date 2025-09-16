@@ -46,30 +46,6 @@ class InvoiceController extends Controller
     $this->view('admin/invoice/index', $data);
 }
 
-    // Show all invoices
-    // public function index()
-    // {
-    //     if (isAdmin()) {
-
-    //         $this->db->query("SELECT * FROM invoice_summary_view ORDER By invoice_date DESC");
-    //         $invoices = $this->db->resultSet();
-
-    //         $data = [
-    //             'invoices' => $invoices
-    //         ];
-    //         $this->view('admin/invoice/index', $data);
-    //     } else {
-    //         $invoices = $this->db->readAll('invoices');
-    //         $data = [
-    //             'invoices' => $invoices
-    //         ];
-    //         $this->view('user/invoice/index', $data);
-    //     }
-
-
-    // }
-
-
     public function searchInvoice()
     {
         $search = isset($_GET['q']) ? trim($_GET['q']) : '';

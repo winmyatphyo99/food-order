@@ -80,8 +80,10 @@ body {
                                         <?php else: ?>
                                             <span class="text-muted">No details available</span>
                                         <?php endif; ?>
+                                        
                                     </td>
                                 </tr>
+                                
                             <?php endforeach; ?>
                         </tbody>
                     </table>
@@ -123,10 +125,11 @@ body {
             <?php endif; ?>
         </div>
     </div>
+     <!-- <?php require_once APPROOT . '/views/user/customer/footer.php'; ?> -->
 </div>
 </div>
     
 </div>
 
 
-<?php require_once APPROOT . '/views/user/inc/footer.php'; ?>
+
