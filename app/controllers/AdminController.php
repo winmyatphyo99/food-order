@@ -16,7 +16,8 @@ class AdminController extends Controller
         $this->view('admin/adminprofile/profile', ['user' => $user]);
     }
 
-     public function index() {
+    public function index()
+    {
         $repo = new ContactRepository();
         $messages = $repo->getAll(); // Fetch all contact messages
 
@@ -69,7 +70,7 @@ class AdminController extends Controller
     {
         $userId = $_SESSION['user_id'];
         $user = $this->userRepository->getUserById($userId);
-       
+
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
@@ -101,7 +102,7 @@ class AdminController extends Controller
         $this->db->query("SELECT COUNT(*) AS total_pending FROM orders WHERE status = 'pending'");
         $total_pending = $this->db->single();
         $total_pending_orders = $total_pending->total_pending;
-        
+
         // Create a data array to pass to the view
         $data = [
             'toalOrders' => $totalOrders,
@@ -110,7 +111,7 @@ class AdminController extends Controller
             'pending_orders' => $total_pending_orders,
             'completedOrdersCount' => $orderRepository->countConfirmedOrders(),
             'totalOrdersCount' => $orderRepository->getTotalOrdersCount(),
-            'salesData' =>$orderRepository->getSalesDataLast7Days(),
+            'salesData' => $orderRepository->getSalesDataLast7Days(),
 
         ];
 
@@ -143,24 +144,24 @@ class AdminController extends Controller
             $this->db->executeStoredProcedure('ConfirmOrderAndReduceQuantity', $procedure_params);
 
             // 5. Create the invoice record in the 'invoices' table.
-            $invoice_data = [
-                'invoice_number' => $invoice_number,
-                'order_id' => $orderId,
-                'user_id' => $order['user_id'],
-                'total_amt' => $order['total_amt'],
-                'delivery_fee' => $order['delivery_fee'],
-                'tax_amount' => $order['tax_amount'],
-                'grand_total' => $order['grand_total'],
-                'created_at' => date('Y-m-d H:i:s')
-            ];
+            // $invoice_data = [
+            //     'invoice_number' => $invoice_number,
+            //     'order_id' => $orderId,
+            //     'user_id' => $order['user_id'],
+            //     'total_amt' => $order['total_amt'],
+            //     'delivery_fee' => $order['delivery_fee'],
+            //     'tax_amount' => $order['tax_amount'],
+            //     'grand_total' => $order['grand_total'],
+            //     'created_at' => date('Y-m-d H:i:s')
+            // ];
 
-            if (!$this->db->create('invoices', $invoice_data)) {
-                setMessage('error', 'Order confirmed but failed to create the invoice record.');
-                redirect('admin/pending');
-                return;
-            }
+            // if (!$this->db->create('invoices', $invoice_data)) {
+            //     setMessage('error', 'Order confirmed but failed to create the invoice record.');
+            //     redirect('admin/pending');
+            //     return;
+            // }
 
-            setMessage('success', 'Order confirmed and invoice created successfully!');
+            setMessage('success', 'Order confirmed  successfully!');
             redirect('admin/pending');
         } catch (Exception $e) {
             setMessage('error', 'Failed to confirm order. Error: ' . $e->getMessage());
@@ -176,66 +177,64 @@ class AdminController extends Controller
     //     $this->view('admin/order/pending', ['orders' => $pending_orders]);
     // }
     public function home()
-{
-    // pagination settings
-    $limit = 7;
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    if ($page < 1) $page = 1;
-    $offset = ($page - 1) * $limit;
+    {
+        // pagination settings
+        $limit = 7;
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        if ($page < 1) $page = 1;
+        $offset = ($page - 1) * $limit;
 
-    // get total records
-    $this->db->query("SELECT COUNT(*) as total FROM orders WHERE status = 'pending'");
-    $row = $this->db->single();
-    $total = is_object($row) ? $row->total : $row['total']; 
-    $totalPages = ceil($total / $limit);
+        // get total records
+        $this->db->query("SELECT COUNT(*) as total FROM orders WHERE status = 'pending'");
+        $row = $this->db->single();
+        $total = is_object($row) ? $row->total : $row['total'];
+        $totalPages = ceil($total / $limit);
 
-    // get paginated orders
-    $this->db->query("SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
-    $this->db->bind(':limit', $limit, PDO::PARAM_INT);
-    $this->db->bind(':offset', $offset, PDO::PARAM_INT);
-    $pending_orders = $this->db->resultSet();
+        // get paginated orders
+        $this->db->query("SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+        $this->db->bind(':limit', $limit, PDO::PARAM_INT);
+        $this->db->bind(':offset', $offset, PDO::PARAM_INT);
+        $pending_orders = $this->db->resultSet();
 
-    // send to view
-    $this->view('admin/order/pending', [
-        'orders' => $pending_orders,
-        'pagination' => [
-            'currentPage' => $page,
-            'totalPages'  => $totalPages
-        ]
-    ]);
-}
+        // send to view
+        $this->view('admin/order/pending', [
+            'orders' => $pending_orders,
+            'pagination' => [
+                'currentPage' => $page,
+                'totalPages'  => $totalPages
+            ]
+        ]);
+    }
 
 
 
     public function completed()
-{
-    // pagination settings
-    $limit = 7; // number of orders per page
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    if ($page < 1) $page = 1;
-    $offset = ($page - 1) * $limit;
+    {
+        // pagination settings
+        $limit = 7; // number of orders per page
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        if ($page < 1) $page = 1;
+        $offset = ($page - 1) * $limit;
 
-    // total confirmed orders
-    $this->db->query("SELECT COUNT(*) as total FROM orders WHERE status = 'confirmed'");
-    $row = $this->db->single();
-    $total = is_object($row) ? $row->total : $row['total'];
-    $totalPages = ceil($total / $limit);
+        // total confirmed orders
+        $this->db->query("SELECT COUNT(*) as total FROM orders WHERE status = 'confirmed'");
+        $row = $this->db->single();
+        $total = is_object($row) ? $row->total : $row['total'];
+        $totalPages = ceil($total / $limit);
 
-    // fetch paginated confirmed orders
-    $this->db->query("SELECT * FROM orders WHERE status = 'confirmed' ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
-    $this->db->bind(':limit', $limit, PDO::PARAM_INT);
-    $this->db->bind(':offset', $offset, PDO::PARAM_INT);
-    $completed_orders = $this->db->resultSet();
+        // fetch paginated confirmed orders
+        $this->db->query("SELECT * FROM orders WHERE status = 'confirmed' ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+        $this->db->bind(':limit', $limit, PDO::PARAM_INT);
+        $this->db->bind(':offset', $offset, PDO::PARAM_INT);
+        $completed_orders = $this->db->resultSet();
 
-    // send to view
-    $this->view('admin/order/completed', [
-        'orders' => $completed_orders,
-        'pagination' => [
-            'currentPage' => $page,
-            'totalPages'  => $totalPages
-        ]
-    ]);
-}
-
-
+        // send to view
+        $this->view('admin/order/completed', [
+            'orders' => $completed_orders,
+            'pagination' => [
+                'currentPage' => $page,
+                'totalPages'  => $totalPages
+            ]
+        ]);
+    }
 }

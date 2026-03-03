@@ -61,8 +61,17 @@ class RatingRepository extends BaseRepository
     public function getTestimonials()
     {
         $this->db->query("
-        SELECT *
-        FROM user_ratings_view
+        SELECT r.id,
+               r.rating,
+               r.comment,
+               r.created_at as rated_at,
+               r.product_id,
+               r.comment,
+               u.profile_image,
+               u.name as user_name
+        FROM ratings r
+        JOIN users u ON r.user_id = u.id
+        ORDER BY r.created_at DESC
         LIMIT 6
     ");
 
