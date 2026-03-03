@@ -540,8 +540,8 @@ class CartController extends Controller
             $created_at     = date('Y-m-d H:i:s');
 
             $this->db->query("
-            INSERT INTO invoices (invoice_number, order_id, status, created_at)
-            VALUES (:invoice_number, :order_id, 'pending', :created_at)
+            INSERT INTO invoices (invoice_number, order_id, created_at)
+            VALUES (:invoice_number, :order_id, :created_at)
         ");
             $this->db->bind(':invoice_number', $invoice_number);
             $this->db->bind(':order_id', $order_id);

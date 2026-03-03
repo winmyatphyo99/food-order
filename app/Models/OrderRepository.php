@@ -94,56 +94,67 @@ class OrderRepository
     }
 
     public function getOrdersByUserIdAndStatus($userId, $status)
-{
-    $this->db->query('SELECT * FROM orders WHERE user_id = :user_id AND status = :status ORDER BY created_at DESC');
-    $this->db->bind(':user_id', $userId);
-    $this->db->bind(':status', $status);
-    
-    $results = $this->db->resultSet();
+    {
+        $this->db->query('SELECT * FROM orders WHERE user_id = :user_id AND status = :status ORDER BY created_at DESC');
+        $this->db->bind(':user_id', $userId);
+        $this->db->bind(':status', $status);
 
-    return $results;
-}
+        $results = $this->db->resultSet();
+
+        return $results;
+    }
 
     public function getLastOrderDateByUserId($userId)
     {
-    $this->db->query('SELECT created_at FROM orders WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 1');
-    $this->db->bind(':user_id', $userId);
+        $this->db->query('SELECT created_at FROM orders WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 1');
+        $this->db->bind(':user_id', $userId);
 
-    $row = $this->db->single();
+        $row = $this->db->single();
 
-    if ($this->db->rowCount() > 0) {
-        return $row->created_at;
-    } else {
-        return null;
+        if ($this->db->rowCount() > 0) {
+            return $row->created_at;
+        } else {
+            return null;
+        }
     }
-    }
 
-    public function getCancelledOrderCountByUserId($userId){
+    public function getCancelledOrderCountByUserId($userId)
+    {
         $this->db->query("select count(*) as total_cancelled from orders where user_id =:user_id and status = 'cancelled'");
         $this->db->bind(':user_id', $userId);
         return $this->db->single()->total_cancelled;
     }
 
     public function getAllOrdersByUserId($userId)
-{
-    $this->db->query("SELECT * FROM orders WHERE user_id = :user_id ORDER BY created_at DESC");
-    $this->db->bind(':user_id', $userId);
-    return $this->db->findAll();
-}
+    {
+        $this->db->query("SELECT * FROM orders WHERE user_id = :user_id ORDER BY created_at DESC");
+        $this->db->bind(':user_id', $userId);
+        return $this->db->findAll();
+    }
 
-public function getRecentOrdersWithImages($userId) {
-    $sql = "SELECT * FROM recent_orders_with_images WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 5";
-    $this->db->query($sql);
-    $this->db->bind(':user_id', $userId);
-    $this->db->execute();
-    return $this->db->findAll();
-}
+    public function getRecentOrdersWithImages($userId)
+    {
+        $sql = "SELECT * FROM recent_orders_with_images WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 5";
+        $this->db->query($sql);
+        $this->db->bind(':user_id', $userId);
+        $this->db->execute();
+        return $this->db->findAll();
+    }
 
-public function getSalesDataLast7Days() {
-   $this->db->query("SELECT DATE(created_at) as date, SUM(grand_total) as total_sales FROM invoices WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(created_at) ORDER BY date ASC");
-    return $this->db->resultSet();
-}
+    public function getSalesDataLast7Days()
+    {
+        // Query the invoice_summary_view to get total sales per day for the last 7 days
+        $this->db->query("
+        SELECT 
+            DATE(invoice_date) AS date, 
+            SUM(grand_total) AS total_sales
+        FROM invoice_summary_view
+        WHERE invoice_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY DATE(invoice_date)
+        ORDER BY DATE(invoice_date) ASC
+    ");
 
-
-
+        // Return the result set
+        return $this->db->resultSet();
+    }
 }
